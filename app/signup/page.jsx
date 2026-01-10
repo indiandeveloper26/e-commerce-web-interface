@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
 
-export default function SignupPage() {
+export default function page() {
     const [form, setForm] = useState({ name: "", email: "", password: "" });
     const [message, setMessage] = useState("");
 
