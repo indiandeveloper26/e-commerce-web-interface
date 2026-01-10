@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { login, updateUser } from "../Redux/authslice";
-export default function LoginPage() {
+export default function page() {
     const [form, setForm] = useState({ email: "", password: "" });
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
