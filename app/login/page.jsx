@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { login, updateUser } from "../Redux/authslice";
+import { toast } from "react-toastify";
 export default function page() {
     const [form, setForm] = useState({ email: "", password: "" });
     const [message, setMessage] = useState("");
@@ -19,6 +20,9 @@ export default function page() {
 
     const { isLoggedIn, user } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
+
+
+
 
     console.log('data', isLoggedIn, user)
 
@@ -37,12 +41,15 @@ export default function page() {
             });
 
             const data = await res.json().catch(() => ({}));
+            let userdata = data.user
 
-            console.log('data', data)
+            console.log('logindata', data.user)
 
             if (data.login === "true") {
-                dispatch(login({ email: 'sahilindia@gmail.com', name: 'sahilinida' }));
-                router.push("/about");
+                dispatch(login({ userdata }));
+                router.push("/products");
+                toast("u are successfull loging");
+
             } else {
                 setMessage(data.error || "Invalid credentials");
             }

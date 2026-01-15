@@ -15,6 +15,9 @@ export async function POST(request) {
         const body = await request.json();
         const { email, password } = body;
 
+
+        console.log(body)
+
         // Validate input
         if (!email || !password) {
             return new NextResponse(
@@ -50,7 +53,7 @@ export async function POST(request) {
 
         // Return success
         const response = new NextResponse(
-            JSON.stringify({ login: "true", message: "Login successful" }),
+            JSON.stringify({ login: "true", message: "Login successful", user }),
             { status: 200 }
         );
 

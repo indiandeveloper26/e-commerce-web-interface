@@ -29,5 +29,10 @@ export function proxy(req) {
 // Protect all pages except login/signup/public API
 
 export const config = {
-    matcher: '/about/:path*',
-}
+    matcher: [
+        '/about/:path*',
+        '/itemlist/:path*',
+        '/contact',          // you can also match exact paths
+    ],
+};
+
