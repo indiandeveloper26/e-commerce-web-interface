@@ -1,5 +1,6 @@
 import dbConnect from "../../lib/mongodb";
 import Order from "../../models/order";
+import Usercrate from "../../models/User";
 
 
 export async function POST(req) {
@@ -46,15 +47,3 @@ export async function POST(req) {
 
 
 
-
-export async function GET(req, { params }) {
-    await dbConnect();
-    try {
-        const { orderid } = params;
-        const order = await Order.findById(orderid).populate("products.product");
-        if (!order) return new Response(JSON.stringify({ message: "Order not found" }), { status: 404 });
-        return new Response(JSON.stringify({ order }), { status: 200 });
-    } catch (err) {
-        return new Response(JSON.stringify({ message: err.message }), { status: 500 });
-    }
-}

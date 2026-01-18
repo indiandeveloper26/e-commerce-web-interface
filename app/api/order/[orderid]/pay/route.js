@@ -2,6 +2,7 @@
 import crypto from "crypto";
 import dbConnect from "../../../../lib/mongodb";
 import Order from "../../../../models/order";
+import Usercrate from "../../../../models/User";
 
 export async function POST(req, { params }) {
     const { orderid } = await params;
@@ -21,13 +22,25 @@ export async function POST(req, { params }) {
 
     await dbConnect();
     try {
+
+        let userId = "6960b6746358147923ff52a0"
         const order = await Order.findById(orderid);
         if (!order) return new Response(JSON.stringify({ message: "Order not found" }), { status: 404 });
+
+
+
 
         order.status = "Paid";
         order.paymentId = razorpay_payment_id;
         order.paymentDate = new Date();
         await order.save();
+        console.log('iddd', order._id)
+
+        await Usercrate.findByIdAndUpdate(
+            userId,
+            { $push: { orders: order._id } },
+            { new: true }
+        );
 
         console.log('ho gyyaa')
         return new Response(JSON.stringify({ message: "Payment verified and order updated", order }), { status: 200 });

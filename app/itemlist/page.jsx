@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../Redux/contextapi"; // apna ThemeContext
+import { toast } from "react-toastify";
 
 export default function AddProductPage() {
     const router = useRouter();
@@ -70,8 +71,8 @@ export default function AddProductPage() {
             const res = await fetch("/api/listproducts", { method: "POST", body: data });
             if (!res.ok) throw new Error("Upload failed");
 
-            alert("Product added successfully!");
-            router.push("/admin/products");
+            toast.success("Product added successfully!")
+            router.push("/products");
         } catch (err) {
             console.error(err);
             alert("Error adding product: " + err.message);

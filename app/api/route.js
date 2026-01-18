@@ -1,17 +1,21 @@
 import { NextResponse } from "next/server";
 import Usercrate from "../models/User";
 import Order from "../models/order";
+import Product from "../models/itemlist";
 
 
 
 
 export async function GET() {
+    // let id = '6969fe24d89ea1e812f79e33'
 
     try {
-        let data = await Order.find()
-        return NextResponse.json({ "data": data })
+        const userId = '6969fe24d89ea1e812f79e33'
+
+        const user = await Order.find()
+        return NextResponse.json({ "data": user })
     } catch (error) {
-        return NextResponse.json({ "error": "api v-1" })
+        return NextResponse.json({ "error": "api v-1tt" })
     }
 
 
