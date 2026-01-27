@@ -3,35 +3,38 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import Image from "next/image";
 
 export default function OrdersPage() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const { user } = useSelector((state) => state.auth);
-    console.log('user', user.userdata._id)
-
-    const userId = user?.userdata?._id
+    const userId = user?.userdata?._id;
 
     useEffect(() => {
         const fetchOrders = async () => {
-            try {
-                const res = (
-                    await axios.get(`http://localhost:3000/api/order/orderdata/${userId}`)
-                ).data;
+            if (!userId) return;
 
-                if (res.orders?.orders) {
-                    setOrders(res.orders.orders);
+            setLoading(true);
+            try {
+                const res = await axios.get(
+                    `/api/order/orderdata/${userId}`
+                );
+
+                if (res.data.success) {
+                    setOrders(res.data.data.orders || []);
                 }
             } catch (err) {
-                console.error(err);
+                console.error("Error fetching orders:", err);
+                setOrders([]);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchOrders();
-    }, []);
+    }, [userId]);
 
     if (loading) {
         return (
@@ -41,7 +44,7 @@ export default function OrdersPage() {
         );
     }
 
-    if (orders.length === 0) {
+    if (!orders.length) {
         return (
             <div className="h-screen flex items-center justify-center">
                 <p className="text-slate-600">No orders found.</p>
@@ -59,15 +62,17 @@ export default function OrdersPage() {
                         key={order._id}
                         className="bg-white rounded-xl shadow p-5 hover:shadow-lg transition"
                     >
+                        {/* Order Header */}
                         <div className="flex justify-between items-center mb-3">
                             <span className="text-sm text-slate-500">
                                 #{order._id.slice(-6)}
                             </span>
                             <span
-                                className={`text-xs px-3 py-1 rounded-full
-                  ${order.status === "Paid"
-                                        ? "bg-green-100 text-green-700"
-                                        : "bg-yellow-100 text-yellow-700"
+                                className={`text-xs px-3 py-1 rounded-full ${order.status === "Paid"
+                                    ? "bg-green-100 text-green-700"
+                                    : order.status === "Pending"
+                                        ? "bg-yellow-100 text-yellow-700"
+                                        : "bg-red-100 text-red-700"
                                     }`}
                             >
                                 {order.status}
@@ -76,32 +81,41 @@ export default function OrdersPage() {
 
                         {/* Products */}
                         <div className="flex flex-col gap-3 mb-2">
-                            {order.products.map(({ product, quantity }) => (
-                                <div key={product._id} className="flex gap-3 items-center">
-                                    <img
-                                        src={product.images?.[0] || "/placeholder.png"}
-                                        alt={product.name}
-                                        className="w-16 h-16 object-cover rounded"
-                                    />
+                            {order.products.map(({ product, quantity }, idx) => (
+                                <div key={idx} className="flex gap-3 items-center">
+                                    <div className="relative w-16 h-16 flex-shrink-0">
+                                        <Image
+                                            src={product?.images?.[0] || "/placeholder.png"}
+                                            alt={product?.name || "Product"}
+                                            fill
+                                            className="object-cover rounded"
+                                        />
+                                    </div>
                                     <div>
-                                        <p className="font-medium">{product.name}</p>
+                                        <p className="font-medium">{product?.name || "Product"}</p>
                                         <p className="text-sm text-slate-500">
-                                            Qty: {quantity} | ₹{product.price}
+                                            Qty: {quantity} | ₹{product?.price || "-"}
                                         </p>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
+                        {/* Total */}
                         <p className="text-lg font-semibold mb-1">
                             Total: ₹{order.totalPrice}
                         </p>
 
+                        {/* Order Time */}
                         <p className="text-xs text-slate-400 mb-3">
                             Ordered at: {new Date(order.createdAt).toLocaleString()}
                         </p>
 
-                        <button className="mt-2 w-full py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition">
+                        {/* Button with #F54D27 */}
+                        <button
+                            className="mt-2 w-full py-2 rounded-lg text-white shadow hover:brightness-90 transition"
+                            style={{ backgroundColor: "#F54D27" }}
+                        >
                             View Order
                         </button>
                     </div>

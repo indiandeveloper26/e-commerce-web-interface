@@ -9,8 +9,8 @@ const UserSchema = new mongoose.Schema(
         orders: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "Order",
-            },
+                ref: "Order", // ye exactly match hona chahiye Order model name se
+            }
         ],
 
         cart: [

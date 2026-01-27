@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
 
 const razorpay = new Razorpay({
@@ -6,8 +7,12 @@ const razorpay = new Razorpay({
 });
 
 export async function POST(req) {
+
+    // return NextResponse.json({ 'dafdsaf': "dataayayaya" })
     try {
         const { orderId, amount } = await req.json(); // amount in paise
+
+        console.log('data', orderId, amount)
         console.log(orderId)
 
         const options = {

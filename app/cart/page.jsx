@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { useTheme } from "../Redux/contextapi";
+import Image from "next/image";
 
 export default function CartPage() {
     const router = useRouter();
@@ -14,19 +15,12 @@ export default function CartPage() {
     const { user } = useSelector((state) => state.auth);
     const userId = user?.userdata?._id;
 
-
-
     const { theme } = useTheme();
     const isDark = theme === "dark";
 
-
-
-
     const productpage = (products) => {
-        router.push(`products/${products.product.slug
-            }`)
-
-    }
+        router.push(`products/${products.product.slug}`);
+    };
 
     useEffect(() => {
         const fetchCart = async () => {
@@ -101,39 +95,43 @@ export default function CartPage() {
                     ) : (
                         <div className="space-y-4">
                             {cart.map((item, index) => (
-                                <div onClick={() => productpage(item)}
-
+                                <div
+                                    onClick={() => productpage(item)}
                                     key={index}
                                     className={`rounded-xl p-4 flex gap-5 transition
-                    ${isDark ? "bg-gray-800 hover:bg-gray-700" : "bg-white hover:shadow-md"}`}
+                                    ${isDark ? "bg-gray-800 hover:bg-gray-700" : "bg-white hover:shadow-md"}`}
                                 >
-                                    <img
-                                        src={item.product.images?.[0] || "/placeholder.png"}
-                                        alt={item.product.name}
-                                        className="w-28 h-28 object-cover rounded-lg border border-gray-300 dark:border-gray-700"
-                                    />
+                                    {/* Optimized Next.js Image */}
+                                    <div className="relative w-28 h-28 flex-shrink-0">
+                                        <Image
+                                            src={item.product.images?.[0] || "/placeholder.png"}
+                                            alt={item.product.name}
+                                            fill
+                                            className="object-cover rounded-lg border border-gray-300 dark:border-gray-700"
+                                        />
+                                    </div>
 
                                     <div className="flex-1 flex flex-col justify-between">
                                         <div>
                                             <h2 className="font-semibold text-lg">
                                                 {item.product.name}
                                             </h2>
-                                            <p className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm`}>
+                                            {/* Price in #F54D27 */}
+                                            <p className="text-sm" style={{ color: "#F54D27" }}>
                                                 ₹{item.product.price} × {item.quantity}
                                             </p>
                                         </div>
 
                                         <span
                                             className={`w-fit px-3 py-1 text-xs font-semibold rounded-full
-                        ${isDark
-                                                    ? "bg-blue-900 text-blue-300"
-                                                    : "bg-blue-100 text-blue-700"}`}
+                        ${isDark ? "bg-blue-900 text-blue-300" : "bg-blue-100 text-blue-700"}`}
                                         >
                                             Qty: {item.quantity}
                                         </span>
                                     </div>
 
-                                    <div className="text-lg font-bold text-green-500">
+                                    {/* Total price of this product in #F54D27 */}
+                                    <div className="text-lg font-bold" style={{ color: "#F54D27" }}>
                                         ₹{item.product.price * item.quantity}
                                     </div>
                                 </div>
@@ -154,9 +152,9 @@ export default function CartPage() {
                         <span>{totalItems}</span>
                     </div>
 
-                    <div className={`flex justify-between mb-2 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                    <div className={`flex justify-between mb-2`}>
                         <span>Subtotal</span>
-                        <span>₹{totalPrice}</span>
+                        <span style={{ color: "#F54D27" }}>₹{totalPrice}</span>
                     </div>
 
                     <div className="flex justify-between mb-2">
@@ -170,14 +168,14 @@ export default function CartPage() {
 
                     <div className="flex justify-between text-xl font-bold">
                         <span>Total</span>
-                        <span className="text-green-500">₹{totalPrice}</span>
+                        <span style={{ color: "#F54D27" }}>₹{totalPrice}</span>
                     </div>
 
+                    {/* Checkout button with #F54D27 */}
                     <button
                         onClick={() => router.push("/checkout")}
-                        className="mt-6 w-full py-3 rounded-xl font-semibold text-white
-              bg-gradient-to-r from-green-600 to-green-700
-              hover:from-green-700 hover:to-green-800 shadow-lg"
+                        className="mt-6 w-full py-3 rounded-xl font-semibold text-white shadow-lg hover:brightness-90 transition"
+                        style={{ backgroundColor: "#F54D27" }}
                     >
                         Proceed to Checkout →
                     </button>

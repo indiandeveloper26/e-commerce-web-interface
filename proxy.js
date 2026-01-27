@@ -8,14 +8,14 @@ export function proxy(req) {
 
     console.log('token ', token)
 
-    // Allow login/signup pages without auth
-    if (req.nextUrl.pathname.startsWith("/login") ||
-        req.nextUrl.pathname.startsWith("/signup")) {
-        return NextResponse.next();
-    }
+    // // Allow login/signup pages without auth
+    // if (req.nextUrl.pathname.startsWith("/login") ||
+    //     req.nextUrl.pathname.startsWith("/signup")) {
+    //     return NextResponse.next();
+    // }
 
     if (!token) {
-        return NextResponse.redirect(new URL("/login", req.url));
+        return NextResponse.redirect(new URL("/products", req.url));
     }
 
     try {

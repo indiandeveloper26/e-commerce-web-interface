@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@react-navigation/bottom-tabs": "^7.10.1",
     "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",

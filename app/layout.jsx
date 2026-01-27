@@ -4,6 +4,7 @@ import Header from "./componet/header";
 import ProviderWrapper from "./Redux/provider";
 import { ThemeProvider } from "./Redux/contextapi";
 import { ToastContainer } from "react-toastify";
+import Footer from "./componet/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
             <main>
               {children}
             </main>
+            <Footer />
             <ToastContainer />
 
           </ThemeProvider>

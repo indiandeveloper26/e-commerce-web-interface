@@ -1,121 +1,123 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchProducts, setProductsFromStorage } from "../Redux/productsSlice";
+import { useRouter } from "next/navigation";
+import ProductSlider from "../slider/page";
 
 export default function ProductsClient() {
-    const [products, setProducts] = useState([]);
-    const [filtered, setFiltered] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const [search, setSearch] = useState("");
     const router = useRouter();
+    const dispatch = useDispatch();
+    const { products, loading, error, loaded } = useSelector((state) => state.products);
 
-    // Fetch products from API
+    const [filtered, setFiltered] = useState([]);
+    const [search, setSearch] = useState("");
+
     useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const res = await fetch("/api/productdata", { cache: "no-store" });
-                if (!res.ok) throw new Error("Failed to fetch products");
-                const data = await res.json();
-                setProducts(data.data || []);
-                setFiltered(data.data || []);
-            } catch (err) {
-                console.error(err);
-                setError(err.message || "Something went wrong");
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProducts();
-    }, []);
+        const stored = localStorage.getItem("products");
+        if (stored) {
+            dispatch(setProductsFromStorage(JSON.parse(stored)));
+        }
+        if (!loaded) {
+            dispatch(fetchProducts());
+        }
+    }, [dispatch, loaded]);
 
-    // Filter products on search input
     useEffect(() => {
         if (!search) return setFiltered(products);
-
-        const filteredProducts = products.filter(
-            (p) =>
-                p.name.toLowerCase().includes(search.toLowerCase()) ||
-                (p.category && p.category.toLowerCase().includes(search.toLowerCase()))
+        setFiltered(
+            products.filter(
+                (p) =>
+                    p.name.toLowerCase().includes(search.toLowerCase()) ||
+                    (p.category && p.category.toLowerCase().includes(search.toLowerCase()))
+            )
         );
-        setFiltered(filteredProducts);
     }, [search, products]);
 
     if (loading)
-        return <p className="text-center py-16 text-gray-500 text-lg">Loading products...</p>;
-
-    if (error)
-        return <p className="text-center py-16 text-red-500 text-lg">Error: {error}</p>;
-
+        return <p className="text-center py-16 text-gray-500 dark:text-gray-400 text-lg">Loading products...</p>;
+    if (error) return <p className="text-center py-16 text-red-500 text-lg">Error: {error}</p>;
     if (products.length === 0)
-        return <p className="text-center py-16 text-gray-500 text-lg">No products available.</p>;
+        return <p className="text-center py-16 text-gray-500 dark:text-gray-400 text-lg">No products available.</p>;
 
     return (
-        <section className="container mx-auto px-4 py-12">
-            <h1 className="text-4xl font-bold mb-6 text-center text-gray-800">Our Products</h1>
+        <section className="container mx-auto px-4 py-12 font-sans">
+            <h1 className="text-4xl font-bold mb-6 text-center text-gray-900 dark:text-gray-100">Our Products</h1>
 
-            {/* Search bar */}
+            {/* Search */}
             <div className="flex justify-center mb-8">
                 <input
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search products..."
-                    className="w-full max-w-md px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full max-w-md px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm
+                     focus:outline-none focus:ring-2 focus:ring-[#F54D27] focus:border-[#F54D27] dark:bg-gray-800 dark:text-gray-100
+                     placeholder-gray-400 dark:placeholder-gray-500 transition"
                 />
             </div>
 
-            {filtered.length === 0 ? (
-                <p className="text-center text-gray-500 text-lg">No products match your search.</p>
-            ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {filtered.map((product) => (
+            <ProductSlider />
+
+            {/* PRODUCTS GRID */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {filtered.length > 0 ? (
+                    filtered.map((product) => (
                         <div
                             key={product._id}
                             onClick={() => router.push(`/products/${product.slug}`)}
-                            className="bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col"
+                            className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md
+                         hover:shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col overflow-hidden"
                         >
-                            <div className="h-40 sm:h-48 md:h-56 w-full relative">
+                            {/* Image */}
+                            <div className="h-48 w-full overflow-hidden relative">
                                 <img
                                     src={product.images?.[0] || "/placeholder.png"}
                                     alt={product.name}
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                                 />
                             </div>
 
-                            <div className="p-3 sm:p-4 flex flex-col flex-grow">
-                                <h2 className="text-md sm:text-lg font-semibold text-gray-800 truncate">{product.name}</h2>
-                                <p className="text-xs sm:text-sm text-gray-500 mt-1">{product.category}</p>
+                            {/* Details */}
+                            <div className="p-4 flex flex-col flex-grow">
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+                                    {product.name}
+                                </h2>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 capitalize">{product.category}</p>
 
-                                <div className="mt-auto pt-2">
+                                {/* Price */}
+                                <div className="mt-2">
                                     {product.discountPrice ? (
                                         <div className="flex items-center gap-2">
-                                            <span className="text-blue-700 font-bold text-md sm:text-lg">₹{product.price}</span>
-                                            <span className="line-through text-gray-400 text-xs sm:text-sm">
-                                                ₹{product.discountPrice}
-                                            </span>
+                                            <span className="text-[#F54D27] font-bold text-lg">₹{product.discountPrice}</span>
+                                            <span className="line-through text-gray-400 dark:text-gray-500 text-sm">₹{product.price}</span>
                                         </div>
                                     ) : (
-                                        <span className="text-blue-700 font-bold text-md sm:text-lg">₹{product.price}</span>
+                                        <span className="text-[#F54D27] font-bold text-lg">₹{product.price}</span>
                                     )}
                                 </div>
 
+                                {/* Button */}
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         router.push(`/products/${product.slug}`);
                                     }}
-                                    className="mt-3 w-full bg-blue-600 text-white py-1.5 sm:py-2 rounded hover:bg-blue-700 transition text-sm sm:text-base"
+                                    className="mt-4 w-full bg-[#F54D27] text-white py-2 rounded-lg
+                             hover:bg-[#e04322] dark:bg-[#F54D27] dark:hover:bg-[#e04322] transition font-medium text-sm sm:text-base"
                                 >
                                     View Details
                                 </button>
                             </div>
                         </div>
-                    ))}
-                </div>
-
-            )}
+                    ))
+                ) : (
+                    <p className="col-span-2 text-center text-gray-500 dark:text-gray-400 text-lg">
+                        No products match your search.
+                    </p>
+                )}
+            </div>
         </section>
     );
 }

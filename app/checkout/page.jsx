@@ -136,10 +136,11 @@ export default function CheckoutPage() {
                     {/* Place Order Button */}
                     <button
                         onClick={handlePlaceOrder}
-                        className="mt-6 w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg"
+                        className="mt-6 w-full py-3 rounded-xl font-semibold text-white shadow-lg bg-[#F54D27] hover:bg-[#e04322] transition-colors"
                     >
                         Place Order & {paymentMethod === "Online" ? "Pay" : "Confirm"} →
                     </button>
+
                 </div>
 
             </div>

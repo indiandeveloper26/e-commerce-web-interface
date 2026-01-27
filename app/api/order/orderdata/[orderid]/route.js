@@ -1,51 +1,39 @@
 import { NextResponse } from "next/server";
 import dbConnect from "../../../../lib/mongodb";
 import Usercrate from "../../../../models/User";
+import Order from "../../../../models/order";   // case-sensitive import
+import Product from "../../../../models/itemlist";
 
 export async function GET(req, { params }) {
 
+    let { orderid } = await params
+    console.log('diddd', orderid)
+    await dbConnect();
+    if (orderid === 'undefind') {
+        return NextResponse.json({ 'data': "id not found" })
+    }
+
     try {
 
-        const { orderid } = await params
-        console.log('redd', orderid)
-        await dbConnect();
+        const userWithOrders = await Usercrate.findById(orderid)
+            .populate({
+                path: "orders",
+                options: { sort: { createdAt: -1 } }, // latest first
+                populate: {
+                    path: "products.product",
+                    model: "Product",
+                    select: "name price images",
+                },
+            })
+            .lean();
 
-        // normally JWT se aayega
-        const userId = orderid
-
-        // if (!userId) {
-        //     return NextResponse.json(
-        //         { success: false, message: "User ID required" },
-        //         { status: 400 }
-        //     );
-        // }
-
-        const user = await Usercrate.findById(userId).populate({
-            path: "orders",
-            options: { sort: { createdAt: -1 } }, // latest orders first
-            populate: {
-                path: "products.product",   // nested populate
-                model: "Product",
-                select: "name price images", // sirf ye fields chahiye
-            },
-        });
-
-        if (!user) {
-            return NextResponse.json(
-                { success: false, message: "User not found" },
-                { status: 404 }
-            );
+        if (!userWithOrders) {
+            return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
         }
 
-        return NextResponse.json({
-            success: true,
-            orders: user,
-        });
+        return NextResponse.json({ success: true, data: userWithOrders }, { status: 200 });
     } catch (error) {
-        console.error(error);
-        return NextResponse.json(
-            { success: false, message: "Server error" },
-            { status: 500 }
-        );
+        console.error("Error fetching user orders:", error);
+        return NextResponse.json({ success: false, message: "Server error" }, { status: 500 });
     }
 }
