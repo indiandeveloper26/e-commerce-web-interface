@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../Redux/authslice";
 import { toast } from "react-toastify";
-import { useTheme } from "../Redux/contextapi"; // adjust the path
+import { useTheme } from "../Redux/contextapi";
 
 export default function LoginPage() {
     const [form, setForm] = useState({ email: "", password: "" });
@@ -51,24 +51,24 @@ export default function LoginPage() {
 
     return (
         <div
-            className={`min-h-screen flex items-center justify-center px-4 ${isDark ? "bg-gray-900" : "bg-gray-100"
+            className={`min-h-screen flex items-center justify-center px-4 py-10 ${isDark ? "bg-gray-900" : "bg-gray-100"
                 }`}
         >
             <div
-                className={`rounded-xl shadow-lg w-full max-w-4xl overflow-hidden grid grid-cols-1 md:grid-cols-2 ${isDark ? "bg-gray-800" : "bg-white"
+                className={`rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden grid grid-cols-1 md:grid-cols-2 ${isDark ? "bg-gray-800" : "bg-white"
                     }`}
             >
                 {/* LEFT IMAGE */}
                 <div
-                    className={`flex items-center justify-center p-6 ${isDark ? "bg-gray-700" : "bg-blue-50"
+                    className={`hidden md:flex items-center justify-center p-6 ${isDark ? "bg-gray-700" : "bg-gradient-to-br from-[#F54D27] to-[#ff7e5f]"
                         }`}
                 >
                     <Image
-                        src="/img/images.jpg"
+                        src="/img/login.jpg"
                         alt="Login Illustration"
                         width={400}
                         height={400}
-                        className="w-full max-w-sm mx-auto"
+                        className="w-full max-w-sm mx-auto rounded-lg shadow-lg"
                         priority
                     />
                 </div>
@@ -76,10 +76,10 @@ export default function LoginPage() {
                 {/* RIGHT FORM */}
                 <div className="p-8 sm:p-10 flex flex-col justify-center">
                     <h1
-                        className={`text-2xl font-bold text-center mb-6 ${isDark ? "text-gray-100" : "text-gray-800"
+                        className={`text-3xl font-bold text-center mb-6 ${isDark ? "text-gray-100" : "text-gray-900"
                             }`}
                     >
-                        Login
+                        Welcome Back
                     </h1>
 
                     {message && (
@@ -93,9 +93,9 @@ export default function LoginPage() {
                             value={form.email}
                             onChange={(e) => setForm({ ...form, email: e.target.value })}
                             required
-                            className={`w-full px-4 py-3 rounded-md border focus:outline-none focus:ring-2 ${isDark
-                                ? "border-gray-600 bg-gray-700 text-gray-100 focus:ring-blue-400"
-                                : "border-gray-300 bg-white text-gray-900 focus:ring-blue-500"
+                            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#F54D27] transition ${isDark
+                                ? "border-gray-600 bg-gray-700 text-gray-100 placeholder-gray-400"
+                                : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
                                 }`}
                         />
 
@@ -103,18 +103,22 @@ export default function LoginPage() {
                             type="password"
                             placeholder="Password"
                             value={form.password}
-                            onChange={(e) => setForm({ ...form, password: e.target.value })}
+                            onChange={(e) =>
+                                setForm({ ...form, password: e.target.value })
+                            }
                             required
-                            className={`w-full px-4 py-3 rounded-md border focus:outline-none focus:ring-2 ${isDark
-                                ? "border-gray-600 bg-gray-700 text-gray-100 focus:ring-blue-400"
-                                : "border-gray-300 bg-white text-gray-900 focus:ring-blue-500"
+                            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#F54D27] transition ${isDark
+                                ? "border-gray-600 bg-gray-700 text-gray-100 placeholder-gray-400"
+                                : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
                                 }`}
                         />
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md transition ${loading ? "opacity-50 cursor-not-allowed" : ""
+                            className={`w-full py-3 mt-2 text-white font-semibold rounded-lg transition-all duration-300 shadow-md ${loading
+                                ? "opacity-50 cursor-not-allowed bg-[#F54D27]"
+                                : "bg-[#F54D27] hover:bg-[#e04322]"
                                 }`}
                         >
                             {loading ? "Logging in..." : "Login"}
@@ -128,10 +132,17 @@ export default function LoginPage() {
                         Don&apos;t have an account?{" "}
                         <Link
                             href="/signup"
-                            className="text-blue-500 hover:underline"
+                            className="text-[#F54D27] font-semibold hover:underline"
                         >
-                            Sign Up
+                            Sign Ups
                         </Link>
+                    </p>
+
+                    <p
+                        className={`text-center text-xs mt-6 ${isDark ? "text-gray-400" : "text-gray-500"
+                            }`}
+                    >
+                        &copy; 2026 YourShop. All rights reserved.
                     </p>
                 </div>
             </div>

@@ -11,6 +11,9 @@ function page() {
 
   let router = useRouter()
 
+  useEffect(() => {
+    router.push("products")
+  }, [])
 
 
 
@@ -20,8 +23,8 @@ function page() {
 
 
   return (
-    router.push("products")
 
+    <h1>fsdf</h1>
   )
 }
 
