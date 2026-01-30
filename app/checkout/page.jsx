@@ -33,6 +33,11 @@ export default function CheckoutPage() {
     }, [router]);
 
     const handlePlaceOrder = async () => {
+
+        if (!userId) {
+            toast.error("pls login first");
+        }
+        console.log('jao')
         if (!address) return toast.error("Please enter shipping address!");
         if (!product) return;
 
@@ -64,7 +69,7 @@ export default function CheckoutPage() {
                 router.push("/orders"); // redirect to user's orders page
             }
         } catch (err) {
-            toast.error(err.message || "Something went wrong");
+            console.log('errr')
         }
     };
 

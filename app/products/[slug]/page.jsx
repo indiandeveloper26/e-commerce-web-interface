@@ -16,8 +16,8 @@ export default function ProductDetailPage() {
     console.log('slug', params)
 
     const { products, loading, error } = useSelector((state) => state.products);
-    const { user } = useSelector((state) => state.auth);
-
+    const { isLoggedIn, user } = useSelector((state) => state.auth);
+    console.log('user', user)
     const [product, setProduct] = useState(null);
     console.log('fsadf', products)
 
@@ -47,9 +47,9 @@ export default function ProductDetailPage() {
     const [adding, setAdding] = useState(false);
 
     const handleAddToCart = async () => {
-        if (!user?.userdata?._id) {
+        if (user?.data?.userId) {
             toast.error("Please login first");
-            router.push("/login");
+            // router.push("/login");
             return;
         }
         setAdding(true);

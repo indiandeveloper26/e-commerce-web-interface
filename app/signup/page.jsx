@@ -6,6 +6,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useTheme } from "../Redux/contextapi";
+import { useDispatch } from "react-redux";
+import { login } from "../Redux/authslice";
 
 export default function SignupPage() {
     const router = useRouter();
@@ -16,6 +18,8 @@ export default function SignupPage() {
     const [agree, setAgree] = useState(false);
     const { theme } = useTheme();
     const isDark = theme === "dark";
+
+    let dispatch = useDispatch()
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -40,10 +44,13 @@ export default function SignupPage() {
             }
 
             const data = await res.json().catch(() => ({}));
+            console.log('jao', data.userId)
 
-            if (data.signup === "true") {
+            if (data.userId) {
+                dispatch(login({ data }));
+                console.log('jao')
                 toast.success("Signup successful! Redirecting...");
-                router.push("/products");
+                router.push("/");
             } else {
                 setMessage(data.message || "Error occurred");
             }

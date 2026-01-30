@@ -2,57 +2,71 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
 import { useTheme } from "../Redux/contextapi";
 import Image from "next/image";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 export default function CartPage() {
     const router = useRouter();
+    const { theme } = useTheme();
+    const isDark = theme === "dark";
+
     const [cart, setCart] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const { user } = useSelector((state) => state.auth);
-    const userId = user?.userdata?._id;
+    const { isLoggedIn, user } = useSelector((state) => state.auth);
+    const userId = user?.userdata?._id; // optional chaining to prevent crash
 
-    const { theme } = useTheme();
-    const isDark = theme === "dark";
+    const fetchCart = async () => {
+        try {
+            const res = await fetch("/api/cart/get", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId }),
+            });
 
-    const productpage = (products) => {
-        router.push(`products/${products.product.slug}`);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || "Failed to fetch cart");
+
+            setCart(data.cart || []);
+        } catch (err) {
+            setError(err.message || "Something went wrong");
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
-        const fetchCart = async () => {
-            try {
-                if (!userId) {
-                    router.push("/login");
-                    return;
-                }
-
-                const res = await fetch("/api/cart/get", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ userId }),
-                });
-
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.message);
-
-                setCart(data.cart);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
+        if (!userId) {
+            setError("Please login first");
+            setLoading(false);
+            return;
+        }
         fetchCart();
-    }, [router, userId]);
+    }, [userId]);
 
-    const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0);
+    const handleDelete = async (itemId) => {
+        if (!confirm("Are you sure you want to remove this item?")) return;
+
+        try {
+            const res = await fetch(`/api/cart/delete/${itemId}`, {
+                method: "DELETE",
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || "Delete failed");
+
+            setCart(cart.filter((item) => item._id !== itemId));
+            toast.success("Item removed from cart");
+        } catch (err) {
+            toast.error(err.message || "Something went wrong");
+        }
+    };
+
+    const totalItems = cart.reduce((sum, i) => sum + (i.quantity || 0), 0);
     const totalPrice = cart.reduce(
-        (sum, i) => sum + i.product.price * i.quantity,
+        (sum, i) => sum + ((i.product?.price || 0) * (i.quantity || 0)),
         0
     );
 
@@ -65,19 +79,13 @@ export default function CartPage() {
 
     if (error)
         return (
-            <p className="text-center py-20 text-red-500 font-semibold">
-                {error}
-            </p>
+            <p className="text-center py-20 text-red-500 font-semibold">{error}</p>
         );
 
     return (
-        <section
-            className={`min-h-screen py-10 transition-colors duration-300
-        ${isDark ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}
-        >
+        <section className={`min-h-screen py-10 ${isDark ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
             <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                {/* 🛒 CART ITEMS */}
+                {/* Cart Items */}
                 <div className="lg:col-span-2">
                     <h1 className="text-3xl font-bold mb-6">
                         Shopping Cart
@@ -88,24 +96,22 @@ export default function CartPage() {
 
                     {cart.length === 0 ? (
                         <div className={`${isDark ? "bg-gray-800" : "bg-white"} p-10 rounded-xl shadow text-center`}>
-                            <p className={isDark ? "text-gray-400" : "text-gray-500"}>
-                                Your cart is empty
-                            </p>
+                            <p className={isDark ? "text-gray-400" : "text-gray-500"}>Your cart is empty</p>
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            {cart.map((item, index) => (
+                            {cart.map((item) => (
                                 <div
-                                    onClick={() => productpage(item)}
-                                    key={index}
-                                    className={`rounded-xl p-4 flex gap-5 transition
-                                    ${isDark ? "bg-gray-800 hover:bg-gray-700" : "bg-white hover:shadow-md"}`}
+                                    key={item._id}
+                                    className={`rounded-xl p-4 flex gap-5 items-center transition ${isDark ? "bg-gray-800 hover:bg-gray-700" : "bg-white hover:shadow-md"}`}
                                 >
-                                    {/* Optimized Next.js Image */}
-                                    <div className="relative w-28 h-28 flex-shrink-0">
+                                    <div
+                                        className="relative w-28 h-28 flex-shrink-0 cursor-pointer"
+                                        onClick={() => router.push(`/products/${item.product?.slug || ""}`)}
+                                    >
                                         <Image
-                                            src={item.product.images?.[0] || "/placeholder.png"}
-                                            alt={item.product.name}
+                                            src={item.product?.images?.[0] || "/placeholder.png"}
+                                            alt={item.product?.name || "Product"}
                                             fill
                                             className="object-cover rounded-lg border border-gray-300 dark:border-gray-700"
                                         />
@@ -113,26 +119,23 @@ export default function CartPage() {
 
                                     <div className="flex-1 flex flex-col justify-between">
                                         <div>
-                                            <h2 className="font-semibold text-lg">
-                                                {item.product.name}
-                                            </h2>
-                                            {/* Price in #F54D27 */}
+                                            <h2 className="font-semibold text-lg">{item.product?.name || "Unknown Product"}</h2>
                                             <p className="text-sm" style={{ color: "#F54D27" }}>
-                                                ₹{item.product.price} × {item.quantity}
+                                                ₹{item.product?.price || 0} × {item.quantity || 0}
                                             </p>
                                         </div>
-
-                                        <span
-                                            className={`w-fit px-3 py-1 text-xs font-semibold rounded-full
-                        ${isDark ? "bg-blue-900 text-blue-300" : "bg-blue-100 text-blue-700"}`}
-                                        >
-                                            Qty: {item.quantity}
-                                        </span>
                                     </div>
 
-                                    {/* Total price of this product in #F54D27 */}
-                                    <div className="text-lg font-bold" style={{ color: "#F54D27" }}>
-                                        ₹{item.product.price * item.quantity}
+                                    <div className="flex flex-col items-end">
+                                        <div className="text-lg font-bold" style={{ color: "#F54D27" }}>
+                                            ₹{(item.product?.price || 0) * (item.quantity || 0)}
+                                        </div>
+                                        <button
+                                            onClick={() => handleDelete(item._id)}
+                                            className="mt-2 px-3 py-1 rounded-lg bg-red-500 text-white text-sm hover:bg-red-600 transition"
+                                        >
+                                            Delete
+                                        </button>
                                     </div>
                                 </div>
                             ))}
@@ -140,11 +143,8 @@ export default function CartPage() {
                     )}
                 </div>
 
-                {/* 💳 ORDER SUMMARY */}
-                <div
-                    className={`rounded-xl p-6 h-fit sticky top-24 transition
-            ${isDark ? "bg-gray-800" : "bg-white shadow-md"}`}
-                >
+                {/* Order Summary */}
+                <div className={`rounded-xl p-6 h-fit sticky top-24 ${isDark ? "bg-gray-800" : "bg-white shadow-md"}`}>
                     <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
 
                     <div className={`flex justify-between mb-2 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
@@ -152,15 +152,13 @@ export default function CartPage() {
                         <span>{totalItems}</span>
                     </div>
 
-                    <div className={`flex justify-between mb-2`}>
+                    <div className="flex justify-between mb-2">
                         <span>Subtotal</span>
                         <span style={{ color: "#F54D27" }}>₹{totalPrice}</span>
                     </div>
 
                     <div className="flex justify-between mb-2">
-                        <span className={isDark ? "text-gray-400" : "text-gray-600"}>
-                            Shipping
-                        </span>
+                        <span className={isDark ? "text-gray-400" : "text-gray-600"}>Shipping</span>
                         <span className="text-green-500 font-medium">Free</span>
                     </div>
 
@@ -171,7 +169,6 @@ export default function CartPage() {
                         <span style={{ color: "#F54D27" }}>₹{totalPrice}</span>
                     </div>
 
-                    {/* Checkout button with #F54D27 */}
                     <button
                         onClick={() => router.push("/checkout")}
                         className="mt-6 w-full py-3 rounded-xl font-semibold text-white shadow-lg hover:brightness-90 transition"
