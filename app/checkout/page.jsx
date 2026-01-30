@@ -18,6 +18,17 @@ export default function CheckoutPage() {
     const [address, setAddress] = useState("");
     const [paymentMethod, setPaymentMethod] = useState("Online");
     const [loading, setLoading] = useState(true);
+    const [id, setsetid] = useState()
+
+    useEffect(() => {
+
+        let dat = async () => {
+            let data = localStorage.getItem("id")
+            console.log('idd', data)
+            setsetid(data)
+        }
+        dat()
+    }, [])
 
     useEffect(() => {
         const buyProduct = JSON.parse(
@@ -34,7 +45,7 @@ export default function CheckoutPage() {
 
     const handlePlaceOrder = async () => {
 
-        if (!userId) {
+        if (!id) {
             toast.error("pls login first");
         }
         console.log('jao')
@@ -46,7 +57,7 @@ export default function CheckoutPage() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    userId,
+                    userId: id,
                     product,
                     quantity: 1,
                     totalPrice: product.price,

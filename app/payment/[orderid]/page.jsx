@@ -16,9 +16,22 @@ export default function PaymentPage() {
     const { Razorpay } = useRazorpay();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [userId, setid] = useState()
 
     const { isLoggedIn, user } = useSelector((state) => state.auth);
-    const userId = user?.userdata?._id;
+    // const userId = user?.userdata?._id;
+
+
+
+    useEffect(() => {
+
+        let dat = async () => {
+            let data = localStorage.getItem("id")
+            console.log('idd', data)
+            setid(data)
+        }
+        dat()
+    }, [])
 
     useEffect(() => {
         const fetchOrder = async () => {
@@ -150,7 +163,7 @@ export default function PaymentPage() {
 
                 {order.paymentMethod === "COD" && (
                     <p className="mt-6 font-semibold text-green-600 text-center">
-                        Order placed successfully! Payment will be collected on delivery.
+                        Order placed successfully!! Payment will be collected on delivery.
                     </p>
                 )}
             </div>

@@ -12,17 +12,30 @@ export default function ProductDetailPage() {
     const params = useParams();
     const router = useRouter();
     const dispatch = useDispatch();
+    const [id, setid] = useState("")
 
     console.log('slug', params)
 
     const { products, loading, error } = useSelector((state) => state.products);
-    const { isLoggedIn, user } = useSelector((state) => state.auth);
-    console.log('user', user)
+    const { user, isLoggedIn } = useSelector((state) => state.auth);
+
     const [product, setProduct] = useState(null);
     console.log('fsadf', products)
 
+    useEffect(() => {
+
+        let dat = async () => {
+            let data = localStorage.getItem("id")
+            console.log('idd', data)
+            setid(data)
+        }
+        dat()
+    }, [])
+
+
     // Filter product from Redux store
     useEffect(() => {
+
         if (products.length > 0) {
             const found = products.find((p) => p.slug === params.slug);
             if (found) {
@@ -47,7 +60,9 @@ export default function ProductDetailPage() {
     const [adding, setAdding] = useState(false);
 
     const handleAddToCart = async () => {
-        if (user?.data?.userId) {
+
+        console.log('loging', isLoggedIn)
+        if (!isLoggedIn) {
             toast.error("Please login first");
             // router.push("/login");
             return;
@@ -57,7 +72,7 @@ export default function ProductDetailPage() {
             const res = await fetch("/api/cart/add", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: user.userdata._id, productId: product._id }),
+                body: JSON.stringify({ userId: id, productId: product._id }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || "Failed to add to cart");

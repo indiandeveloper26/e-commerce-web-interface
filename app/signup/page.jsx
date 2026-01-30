@@ -44,9 +44,15 @@ export default function SignupPage() {
             }
 
             const data = await res.json().catch(() => ({}));
+
+            console.log('dsfsadf', data)
             console.log('jao', data.userId)
 
             if (data.userId) {
+                console.log('idd', data)
+
+                localStorage.setItem("id", data?.userId)
+                console.log('svelocall')
                 dispatch(login({ data }));
                 console.log('jao')
                 toast.success("Signup successful! Redirecting...");

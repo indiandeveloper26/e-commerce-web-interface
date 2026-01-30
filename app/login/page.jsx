@@ -34,6 +34,10 @@ export default function LoginPage() {
 
             const data = await res.json().catch(() => ({}));
             const userdata = data.user;
+            console.log('userdt', userdata)
+            localStorage.setItem("id", userdata._id)
+            console.log('dataidd', userdata._id)
+            console.log('svelocall')
 
             if (data.login === "true") {
                 dispatch(login({ userdata }));
