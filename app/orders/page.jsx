@@ -2,31 +2,42 @@
 
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import Image from "next/image";
 
 export default function OrdersPage() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [userId, setUserId] = useState(null);
 
-    const { user } = useSelector((state) => state.auth);
-    const userId = user?.userdata?._id;
-
+    // Load userId from localStorage
     useEffect(() => {
-        const fetchOrders = async () => {
-            if (!userId) return;
+        const storedId = localStorage.getItem("id");
+        if (storedId) {
+            setUserId(storedId);
+        } else {
+            setError("Please login first");
+            setLoading(false);
+        }
+    }, []);
 
+    // Fetch orders when userId is available
+    useEffect(() => {
+        if (!userId) return;
+
+        const fetchOrders = async () => {
             setLoading(true);
             try {
-                const res = await axios.get(
-                    `/api/order/orderdata/${userId}`
-                );
-
+                const res = await axios.get(`/api/order/orderdata/${userId}`);
+                console.log(res)
                 if (res.data.success) {
                     setOrders(res.data.data.orders || []);
+                } else {
+                    setError("Failed to fetch orders");
                 }
             } catch (err) {
                 console.error("Error fetching orders:", err);
+                setError("Something went wrong");
                 setOrders([]);
             } finally {
                 setLoading(false);
@@ -40,6 +51,14 @@ export default function OrdersPage() {
         return (
             <div className="h-screen flex items-center justify-center">
                 <p className="text-lg animate-pulse">Loading orders...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="h-screen flex items-center justify-center">
+                <p className="text-red-500 font-semibold">{error}</p>
             </div>
         );
     }
@@ -115,6 +134,7 @@ export default function OrdersPage() {
                         <button
                             className="mt-2 w-full py-2 rounded-lg text-white shadow hover:brightness-90 transition"
                             style={{ backgroundColor: "#F54D27" }}
+                            onClick={() => alert(`Order ${order._id} details clicked!`)}
                         >
                             View Order
                         </button>

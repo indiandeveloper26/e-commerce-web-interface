@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "../Redux/contextapi";
 import Image from "next/image";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
 
 export default function CartPage() {
     const router = useRouter();
@@ -15,35 +14,42 @@ export default function CartPage() {
     const [cart, setCart] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [userId, setUserId] = useState(null);
 
-    const { isLoggedIn, user } = useSelector((state) => state.auth);
-    const userId = user?.userdata?._id; // optional chaining to prevent crash
-
-    const fetchCart = async () => {
-        try {
-            const res = await fetch("/api/cart/get", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId }),
-            });
-
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || "Failed to fetch cart");
-
-            setCart(data.cart || []);
-        } catch (err) {
-            setError(err.message || "Something went wrong");
-        } finally {
-            setLoading(false);
-        }
-    };
-
+    // Load userId from localStorage
     useEffect(() => {
-        if (!userId) {
+        const storedId = localStorage.getItem("id");
+        if (storedId) {
+            setUserId(storedId);
+        } else {
             setError("Please login first");
             setLoading(false);
-            return;
         }
+    }, []);
+
+    // Fetch cart when userId is available
+    useEffect(() => {
+        if (!userId) return;
+
+        const fetchCart = async () => {
+            try {
+                const res = await fetch("/api/cart/get", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ userId }),
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || "Failed to fetch cart");
+
+                setCart(data.cart || []);
+            } catch (err) {
+                setError(err.message || "Something went wrong");
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchCart();
     }, [userId]);
 
