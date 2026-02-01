@@ -6,9 +6,11 @@ import Usercrate from "../../../../models/User";
 
 export async function POST(req, { params }) {
     const { orderid } = await params;
-    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = await req.json();
+
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature, userid } = await req.json();
 
 
+    console.log('orderidd', orderid, 'userid', userid)
 
     // verify signature
     const generated_signature = crypto
@@ -23,7 +25,7 @@ export async function POST(req, { params }) {
     await dbConnect();
     try {
 
-        let userId = "6960b6746358147923ff52a0"
+        // let userId = "6960b6746358147923ff52a0"
         const order = await Order.findById(orderid);
         if (!order) return new Response(JSON.stringify({ message: "Order not found" }), { status: 404 });
 
@@ -37,7 +39,7 @@ export async function POST(req, { params }) {
         console.log('iddd', order._id)
 
         await Usercrate.findByIdAndUpdate(
-            userId,
+            userid,
             { $push: { orders: order._id } },
             { new: true }
         );

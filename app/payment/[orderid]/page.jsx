@@ -7,11 +7,14 @@ import { useTheme } from "../../Redux/contextapi";
 import axios from "axios";
 import { useRazorpay } from "react-razorpay";
 import { useSelector } from "react-redux";
+import ProductSkeletonCard from "../../componet/skeliton";
 
 export default function PaymentPage() {
     const router = useRouter();
     const { orderid } = useParams();
-    const { theme } = useTheme();
+
+    console.log('orderid', orderid)
+    const { theme, userid } = useTheme();
     const isDark = theme === "dark";
     const { Razorpay } = useRazorpay();
     const [order, setOrder] = useState(null);
@@ -21,22 +24,18 @@ export default function PaymentPage() {
     const { isLoggedIn, user } = useSelector((state) => state.auth);
     // const userId = user?.userdata?._id;
 
-
+    console.log('useid', userid)
 
     useEffect(() => {
 
-        let dat = async () => {
-            let data = localStorage.getItem("id")
-            console.log('idd', data)
-            setid(data)
-        }
-        dat()
-    }, [])
+        setid(userid)
+    }, [userid])
 
     useEffect(() => {
         const fetchOrder = async () => {
             try {
                 const { data } = await axios.get(`/api/order/${orderid}`);
+                console.log('dasfasdprder', data)
                 setOrder(data.order);
             } catch (err) {
                 toast.error(err.response?.data?.message || err.message || "Failed to fetch order");
@@ -78,7 +77,7 @@ export default function PaymentPage() {
                 handler: async function (response) {
                     try {
                         const verifyRes = await axios.post(`/api/order/${order._id}/pay`, {
-                            userId,
+                            userid,
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_signature: response.razorpay_signature,
@@ -110,9 +109,7 @@ export default function PaymentPage() {
 
     if (loading)
         return (
-            <p className={`text-center py-20 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
-                Loading Order...
-            </p>
+            <ProductSkeletonCard />
         );
 
     if (!order)

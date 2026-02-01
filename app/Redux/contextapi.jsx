@@ -8,6 +8,7 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
     const [theme, setTheme] = useState("light");
+    const [userid, setuserid] = useState(null)
 
     // Load theme from localStorage
     useEffect(() => {
@@ -27,7 +28,7 @@ export const ThemeProvider = ({ children }) => {
     };
 
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <ThemeContext.Provider value={{ theme, toggleTheme, userid, setuserid }}>
             {children}
         </ThemeContext.Provider>
     );

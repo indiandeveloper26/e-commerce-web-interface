@@ -24,7 +24,8 @@ function page() {
 
   return (
 
-    <h1>fsdf</h1>
+    <>
+    </>
   )
 }
 

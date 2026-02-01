@@ -8,7 +8,10 @@ export async function POST(req) {
         await dbConnect();
 
         const body = await req.json(); // Next.js 16 App Router style
-        const { userId, product, quantity, totalPrice, address, paymentMethod } = body;
+
+        console.log('paicalling')
+        const { userId, product, quantity, orderid, totalPrice, address, paymentMethod } = body;
+        console.log('userid', userId, product, quantity, totalPrice, address, paymentMethod)
 
         if (!userId || !product || !totalPrice || !address) {
             return new Response(JSON.stringify({ message: "Missing required fields" }), {

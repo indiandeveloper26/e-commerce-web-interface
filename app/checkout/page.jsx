@@ -9,7 +9,7 @@ import { useTheme } from "../Redux/contextapi";
 
 export default function CheckoutPage() {
     const router = useRouter();
-    const { theme } = useTheme();
+    const { theme, userid, setuserid } = useTheme();
     const isDark = theme === "dark";
     const { user } = useSelector((state) => state.auth);
     const userId = user?.userdata?._id;
@@ -24,7 +24,8 @@ export default function CheckoutPage() {
 
         let dat = async () => {
             let data = localStorage.getItem("id")
-            console.log('idd', data)
+            console.log('userid', data)
+            setuserid(data)
             setsetid(data)
         }
         dat()

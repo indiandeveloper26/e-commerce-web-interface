@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchProducts, setProductsFromStorage } from "../Redux/productsSlice";
 import { useRouter } from "next/navigation";
 import ProductSlider from "../slider/page";
+import ProductSkeletonCard from "../componet/skeliton";
 
 export default function ProductsClient() {
     const router = useRouter();
@@ -38,7 +39,7 @@ export default function ProductsClient() {
     }, [search, products]);
 
     if (loading)
-        return <p className="text-center py-16 text-gray-500 text-lg">Loading products...</p>;
+        return <ProductSkeletonCard />
     if (error) return <p className="text-center py-16 text-red-500 text-lg">Error: {error}</p>;
     if (products.length === 0)
         return <p className="text-center py-16 text-gray-500 text-lg">No products available.</p>;

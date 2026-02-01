@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "../Redux/contextapi";
 import Image from "next/image";
 import { toast } from "react-toastify";
+import ProductSkeletonCard from "../componet/skeliton";
 
 export default function CartPage() {
     const router = useRouter();
@@ -78,9 +79,7 @@ export default function CartPage() {
 
     if (loading)
         return (
-            <p className={`text-center py-20 ${isDark ? "text-gray-400" : "text-gray-500"}`}>
-                Loading cart...
-            </p>
+            <ProductSkeletonCard />
         );
 
     if (error)

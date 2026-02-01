@@ -3,6 +3,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import ProductSkeletonCard from "../componet/skeliton";
 
 export default function OrdersPage() {
     const [orders, setOrders] = useState([]);
@@ -49,9 +50,7 @@ export default function OrdersPage() {
 
     if (loading) {
         return (
-            <div className="h-screen flex items-center justify-center">
-                <p className="text-lg animate-pulse">Loading orders...</p>
-            </div>
+            <ProductSkeletonCard />
         );
     }
 
