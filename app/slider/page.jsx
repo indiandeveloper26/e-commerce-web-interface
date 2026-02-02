@@ -1,139 +1,115 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { Zap } from "lucide-react";
 
-export default function ProductSlider() {
+export default function FastAutoSlider() {
     const router = useRouter();
     const [products, setProducts] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [itemsPerSlide, setItemsPerSlide] = useState(3);
+    const [itemsPerView, setItemsPerView] = useState(3);
+    const [isHovered, setIsHovered] = useState(false);
 
+    // Initial Data Fetch
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth < 640) setItemsPerSlide(2);
-            else setItemsPerSlide(3);
+            if (window.innerWidth < 640) setItemsPerView(1.5);
+            else if (window.innerWidth < 1024) setItemsPerView(2);
+            else setItemsPerView(3);
         };
         handleResize();
         window.addEventListener("resize", handleResize);
+
+        fetch("/api/productdata")
+            .then((res) => res.json())
+            .then((data) => setProducts(data.data || []))
+            .catch(() => {
+                // Dummy data if API fails
+                setProducts(Array(8).fill(null).map((_, i) => ({
+                    _id: `${i}`,
+                    name: `Flash Item ${i + 1}`,
+                    price: 999 + i * 100,
+                    images: ["/placeholder.png"],
+                    slug: "product-link"
+                })));
+            });
+
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const res = await fetch("/api/productdata", { cache: "no-store" });
-                const data = await res.json();
-                setProducts(data.data || []);
-            } catch {
-                setProducts([
-                    { _id: "1", name: "Stylish T-Shirt", category: "Clothing", price: 799, discountPrice: 699, images: ["/placeholder.png"], slug: "stylish-tshirt" },
-                    { _id: "2", name: "Cool Sneakers", category: "Footwear", price: 2999, images: ["/placeholder.png"], slug: "cool-sneakers" },
-                    { _id: "3", name: "Smart Watch", category: "Electronics", price: 4999, discountPrice: 4499, images: ["/placeholder.png"], slug: "smart-watch" },
-                ]);
-            }
-        };
-        fetchProducts();
-    }, []);
-
-    const totalSlides = Math.ceil(products.length / itemsPerSlide);
-    const nextSlide = () => setCurrentIndex((p) => (p + 1) % totalSlides);
-    const prevSlide = () => setCurrentIndex((p) => (p - 1 + totalSlides) % totalSlides);
+    // 0.5 SECOND AUTO-SLIDE LOGIC
+    const maxIndex = products.length > 0 ? products.length - Math.ceil(itemsPerView) : 0;
 
     useEffect(() => {
-        const i = setInterval(nextSlide, 3000);
-        return () => clearInterval(i);
-    }, [totalSlides]);
+        if (isHovered || products.length === 0) return;
+
+        const interval = setInterval(() => {
+            setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
+        }, 1000); // 0.5 Seconds
+
+        return () => clearInterval(interval);
+    }, [maxIndex, isHovered, products.length]);
 
     return (
-        <div className="relative lg:w-[50%] py-8 mx-auto">
-            {/* Arrows */}
-            <button
-                onClick={prevSlide}
-                className="absolute left-2 top-1/2 -translate-y-1/2
-                p-2 bg-white border-2 border-[#F54D27]
-                rounded-full shadow-md hover:shadow-lg
-                hover:bg-[#F54D27]/10 transition z-10"
-            >
-                <FaChevronLeft className="text-[#F54D27]" />
-            </button>
+        <div
+            className="w-full max-w-7xl mx-auto py-6 px-4"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            <div className="flex items-center gap-3 mb-6 px-2">
+                <div className="flex items-center gap-2 bg-[#F54D27]/10 px-3 py-1 rounded-full">
+                    <Zap size={14} className="text-[#F54D27] fill-[#F54D27]" />
+                    <span className="text-[#F54D27] font-black text-[10px] uppercase tracking-widest">Live Feed</span>
+                </div>
+                <div className="h-[1px] flex-grow bg-gray-100"></div>
+            </div>
 
-            <button
-                onClick={nextSlide}
-                className="absolute right-2 top-1/2 -translate-y-1/2
-                p-2 bg-white border-2 border-[#F54D27]
-                rounded-full shadow-md hover:shadow-lg
-                hover:bg-[#F54D27]/10 transition z-10"
-            >
-                <FaChevronRight className="text-[#F54D27]" />
-            </button>
-
-            {/* Slider */}
-            <div className="overflow-hidden w-full">
-                <div
-                    className="flex transition-transform duration-500"
-                    style={{ transform: `translateX(-${(currentIndex * 100) / totalSlides}%)` }}
+            <div className="overflow-hidden rounded-[2rem]">
+                <motion.div
+                    className="flex"
+                    animate={{ x: `-${currentIndex * (100 / itemsPerView)}%` }}
+                    transition={{
+                        type: "spring",
+                        stiffness: 500, // Instant snap
+                        damping: 50,   // No shaking
+                        mass: 0.9      // Very light feel
+                    }}
                 >
                     {products.map((product) => (
                         <div
                             key={product._id}
-                            className="flex-none px-2 cursor-pointer"
-                            style={{ width: window.innerWidth < 640 ? "50%" : "33.33%" }}
-                            onClick={() => router.push(`/products/${product.slug}`)}
+                            className="flex-none px-2"
+                            style={{ width: `${100 / itemsPerView}%` }}
                         >
-                            {/* CARD */}
                             <div
-                                className="
-                                bg-white
-                                border-2 border-[#F54D27]
-                                hover:border-4 hover:border-[#F54D27]
-                                rounded-xl
-                                shadow-lg hover:shadow-2xl
-                                transform hover:scale-105
-                                transition-all
-                                flex flex-col
-                                "
+                                onClick={() => router.push(`/products/${product.slug}`)}
+                                className="group cursor-pointer bg-white rounded-3xl overflow-hidden border border-gray-50 shadow-sm hover:border-[#F54D27] transition-colors duration-200"
                             >
-                                <div className="h-40 w-full overflow-hidden rounded-t-xl">
+                                <div className="aspect-[4/3] bg-gray-50 relative">
                                     <img
                                         src={product.images[0]}
-                                        alt={product.name}
-                                        className="w-full h-full object-cover hover:scale-110 transition"
+                                        className="w-full h-full object-cover"
+                                        alt=""
                                     />
+                                    {/* Glass Overlay on Hover */}
+                                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <div className="bg-white/90 backdrop-blur-sm p-2 rounded-full text-[#F54D27]">
+                                            <Zap size={20} fill="#F54D27" />
+                                        </div>
+                                    </div>
                                 </div>
-
-                                <div className="p-3 flex flex-col flex-grow">
-                                    <h3 className="font-semibold truncate">
+                                <div className="p-4 bg-white">
+                                    <h3 className="font-bold text-gray-900 text-sm truncate uppercase tracking-tighter">
                                         {product.name}
                                     </h3>
-                                    <p className="text-sm text-gray-500">
-                                        {product.category}
-                                    </p>
-
-                                    <div className="mt-auto pt-2">
-                                        <span className="text-[#F54D27] font-bold text-lg">
-                                            ₹{product.discountPrice || product.price}
-                                        </span>
-                                    </div>
+                                    <p className="text-[#F54D27] font-black italic mt-1 text-sm">₹{product.price}</p>
                                 </div>
                             </div>
                         </div>
                     ))}
-                </div>
-            </div>
-
-            {/* Dots */}
-            <div className="flex justify-center mt-5 gap-3">
-                {Array.from({ length: totalSlides }).map((_, idx) => (
-                    <button
-                        key={idx}
-                        onClick={() => setCurrentIndex(idx)}
-                        className={`w-4 h-4 rounded-full border-2 border-[#F54D27]
-                            ${currentIndex === idx ? "bg-[#F54D27]" : "bg-transparent"}
-                        `}
-                    />
-                ))}
+                </motion.div>
             </div>
         </div>
     );

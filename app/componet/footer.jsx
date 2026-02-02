@@ -1,74 +1,131 @@
 "use client";
 
 import Link from "next/link";
-import { FaFacebookF, FaInstagram, FaTwitter, FaWhatsapp } from "react-icons/fa";
+import { Facebook, Instagram, Twitter, MessageSquare, Mail, Phone, MapPin, Send } from "lucide-react";
+import { useTheme } from "../Redux/contextapi";
 
 export default function Footer() {
+    const { theme } = useTheme();
+    const isDark = theme === "dark";
+
     return (
-        <footer className="bg-[#F54D27] text-white mt-16 border-t-4 border-[#e04322]">
-            <div className="container mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+        <footer className={`mt-24 relative overflow-hidden ${isDark ? "bg-[#0f1115] text-white" : "bg-gray-50 text-gray-900"}`}>
 
-                {/* Brand */}
-                <div>
-                    <h2 className="text-2xl font-bold mb-3">MyApp</h2>
-                    <p className="text-sm text-white/90 leading-relaxed">
-                        Your one-stop shop for quality products.
-                        Fast delivery, best prices, and trusted service.
-                    </p>
-                </div>
+            {/* Top Wave/Curve Divider */}
+            <div className={`absolute top-0 left-0 w-full h-1 bg-[#F54D27]`} />
 
-                {/* Quick Links */}
-                <div>
-                    <h3 className="text-lg font-semibold mb-3">Quick Links</h3>
-                    <ul className="space-y-2 text-sm">
-                        <li><Link href="/" className="hover:underline">Home</Link></li>
-                        <li><Link href="/products" className="hover:underline">Products</Link></li>
-                        <li><Link href="/orders" className="hover:underline">Orders</Link></li>
-                        <li><Link href="/cart" className="hover:underline">Cart</Link></li>
-                    </ul>
-                </div>
+            <div className="container mx-auto px-6 pt-20 pb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
 
-                {/* Customer Support */}
-                <div>
-                    <h3 className="text-lg font-semibold mb-3">Customer Support</h3>
-                    <ul className="space-y-2 text-sm">
-                        <li><Link href="/about" className="hover:underline">About Us</Link></li>
-                        <li><Link href="/contact" className="hover:underline">Contact Us</Link></li>
-                        <li><Link href="/privacy" className="hover:underline">Privacy Policy</Link></li>
-                        <li><Link href="/terms" className="hover:underline">Terms & Conditions</Link></li>
-                    </ul>
-                </div>
+                    {/* Brand & Manifesto */}
+                    <div className="lg:col-span-4 space-y-6">
+                        <Link href="/" className="flex items-center gap-2 group">
+                            <div className="w-12 h-12 bg-[#F54D27] text-white rounded-2xl flex items-center justify-center font-black italic text-2xl rotate-3 group-hover:rotate-0 transition-transform">
+                                M
+                            </div>
+                            <span className="text-3xl font-black italic tracking-tighter uppercase">
+                                MyApp<span className="text-[#F54D27]">.</span>
+                            </span>
+                        </Link>
+                        <p className="text-sm font-medium opacity-60 leading-relaxed max-w-sm uppercase tracking-wider text-[11px]">
+                            Redefining the digital marketplace with premium aesthetics and unparalleled performance. Join the revolution in modern commerce.
+                        </p>
 
-                {/* Social + Contact */}
-                <div>
-                    <h3 className="text-lg font-semibold mb-3">Connect With Us</h3>
-
-                    <div className="flex gap-3 mb-4">
-                        <a href="#" className="p-2 border-2 border-white rounded-full hover:bg-white hover:text-[#F54D27] transition">
-                            <FaFacebookF />
-                        </a>
-                        <a href="#" className="p-2 border-2 border-white rounded-full hover:bg-white hover:text-[#F54D27] transition">
-                            <FaInstagram />
-                        </a>
-                        <a href="#" className="p-2 border-2 border-white rounded-full hover:bg-white hover:text-[#F54D27] transition">
-                            <FaTwitter />
-                        </a>
-                        <a href="#" className="p-2 border-2 border-white rounded-full hover:bg-white hover:text-[#F54D27] transition">
-                            <FaWhatsapp />
-                        </a>
+                        {/* Social Cloud */}
+                        <div className="flex gap-3">
+                            {[
+                                { Icon: Facebook, href: "#" },
+                                { Icon: Instagram, href: "#" },
+                                { Icon: Twitter, href: "#" },
+                                { Icon: MessageSquare, href: "#" },
+                            ].map((social, i) => (
+                                <a
+                                    key={i}
+                                    href={social.href}
+                                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:-translate-y-1 ${isDark ? "bg-gray-800 text-white hover:bg-[#F54D27]" : "bg-white shadow-sm text-gray-400 hover:bg-[#F54D27] hover:text-white"
+                                        }`}
+                                >
+                                    <social.Icon size={18} />
+                                </a>
+                            ))}
+                        </div>
                     </div>
 
-                    <p className="text-sm text-white/90">
-                        📞 +91 98765 43210 <br />
-                        ✉ support@myapp.com
+                    {/* Quick Navigation */}
+                    <div className="lg:col-span-2">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#F54D27] mb-8">Navigation</h3>
+                        <ul className="space-y-4">
+                            {["Home", "Products", "Orders", "Cart"].map((item) => (
+                                <li key={item}>
+                                    <Link
+                                        href={`/${item.toLowerCase() === 'home' ? '' : item.toLowerCase()}`}
+                                        className="text-xs font-bold uppercase tracking-widest opacity-40 hover:opacity-100 hover:text-[#F54D27] transition-all"
+                                    >
+                                        {item}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Support & Legal */}
+                    <div className="lg:col-span-2">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#F54D27] mb-8">Support</h3>
+                        <ul className="space-y-4">
+                            {["About", "Contact", "Privacy", "Terms"].map((item) => (
+                                <li key={item}>
+                                    <Link
+                                        href={`/${item.toLowerCase()}`}
+                                        className="text-xs font-bold uppercase tracking-widest opacity-40 hover:opacity-100 hover:text-[#F54D27] transition-all"
+                                    >
+                                        {item}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Newsletter / Contact Card */}
+                    <div className="lg:col-span-4">
+                        <div className={`p-8 rounded-[2.5rem] ${isDark ? "bg-gray-800/50" : "bg-white shadow-xl border border-gray-100"}`}>
+                            <h3 className="text-sm font-black italic uppercase tracking-tighter mb-4">Join the Inner Circle</h3>
+                            <div className="relative mb-6">
+                                <input
+                                    type="text"
+                                    placeholder="your@email.com"
+                                    className={`w-full py-4 px-6 rounded-2xl text-xs font-bold uppercase tracking-widest outline-none transition-all ${isDark ? "bg-gray-900 border-gray-700 focus:border-[#F54D27]" : "bg-gray-50 border-gray-100 focus:border-[#F54D27]"
+                                        } border`}
+                                />
+                                <button className="absolute right-2 top-2 p-2.5 bg-[#F54D27] text-white rounded-xl hover:brightness-110 transition-all">
+                                    <Send size={16} />
+                                </button>
+                            </div>
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
+                                    <Phone size={14} className="text-[#F54D27]" />
+                                    <span className="text-[10px] font-black tracking-widest uppercase">+91 98765 43210</span>
+                                </div>
+                                <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
+                                    <Mail size={14} className="text-[#F54D27]" />
+                                    <span className="text-[10px] font-black tracking-widest uppercase">support@myapp.com</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Bottom Bar */}
+                <div className={`mt-20 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 ${isDark ? "border-gray-800" : "border-gray-100"}`}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 text-center md:text-left">
+                        © {new Date().getFullYear()} MyApp Digital Ecosystem. Crafted for excellence.
                     </p>
+                    <div className="flex gap-6">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-20 hover:opacity-100 cursor-pointer transition-opacity">Visa</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-20 hover:opacity-100 cursor-pointer transition-opacity">Mastercard</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-20 hover:opacity-100 cursor-pointer transition-opacity">UPI</span>
+                    </div>
                 </div>
             </div>
-
-            {/* Bottom Bar */}
-            <div className="bg-[#e04322] text-center py-4 text-sm border-t border-white/30">
-                © {new Date().getFullYear()} MyApp. All rights reserved.
-            </div>
-        </footer>
+        </footer >
     );
 }

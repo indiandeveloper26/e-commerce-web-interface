@@ -8,18 +8,21 @@ import { toast } from "react-toastify";
 import { useTheme } from "../Redux/contextapi";
 import { useDispatch } from "react-redux";
 import { login } from "../Redux/authslice";
+import { motion, AnimatePresence } from "framer-motion";
+import { User, Mail, Lock, Loader2, ArrowRight, ShieldCheck, Eye, EyeOff } from "lucide-react";
 
 export default function SignupPage() {
+    // --- YOUR REAL LOGIC ---
     const router = useRouter();
     const [form, setForm] = useState({ name: "", email: "", password: "" });
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [agree, setAgree] = useState(false);
+
     const { theme } = useTheme();
     const isDark = theme === "dark";
-
-    let dispatch = useDispatch()
+    const dispatch = useDispatch();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,6 +30,7 @@ export default function SignupPage() {
 
         if (!agree) {
             setMessage("You must agree to the Terms & Conditions.");
+            toast.warning("Please accept the terms.");
             return;
         }
 
@@ -40,25 +44,19 @@ export default function SignupPage() {
 
             if (res.status === 409) {
                 setMessage("Email already exists. Please login or use another email.");
+                setLoading(false);
                 return;
             }
 
             const data = await res.json().catch(() => ({}));
 
-            console.log('dsfsadf', data)
-            console.log('jao', data.userId)
-
             if (data.userId) {
-                console.log('idd', data)
-
-                localStorage.setItem("id", data?.userId)
-                console.log('svelocall')
-                dispatch(login({ data }));
-                console.log('jao')
-                toast.success("Signup successful! Redirecting...");
+                localStorage.setItem("id", data.userId);
+                dispatch(login({ data })); // Using your dispatch logic
+                toast.success("Signup successful! Welcome to CoreCart.");
                 router.push("/");
             } else {
-                setMessage(data.message || "Error occurred");
+                setMessage(data.message || "Error occurred during signup.");
             }
         } catch (err) {
             setMessage("Something went wrong. Please try again.");
@@ -68,137 +66,148 @@ export default function SignupPage() {
     };
 
     return (
-        <div
-            className={`min-h-screen flex items-center justify-center px-4 py-10 ${isDark ? "bg-gray-900" : "bg-gray-100"
-                }`}
-        >
-            <div
-                className={`rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden grid grid-cols-1 md:grid-cols-2 ${isDark ? "bg-gray-800" : "bg-white"
-                    }`}
+        <div className={`min-h-screen flex items-center justify-center font-sans transition-colors duration-500 ${isDark ? "bg-[#0a0a0b]" : "bg-[#f8f9fa]"}`}>
+
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className={`w-full max-w-5xl mx-4 grid grid-cols-1 md:grid-cols-2 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] rounded-[2.5rem] overflow-hidden ${isDark ? "bg-[#121214] border border-white/5" : "bg-white"}`}
             >
-                {/* LEFT IMAGE */}
-                <div
-                    className={`hidden md:flex items-center justify-center p-6 ${isDark ? "bg-gray-700" : "bg-gradient-to-br from-[#F54D27] to-[#ff7e5f]"
-                        }`}
-                >
-                    <Image
-                        src="/img/login.jpg"
-                        alt="Signup Illustration"
-                        width={400}
-                        height={400}
-                        className="w-full max-w-sm mx-auto rounded-lg shadow-lg"
-                        priority
-                    />
+
+                {/* LEFT SIDE: Brand Visual (Matches Login) */}
+                <div className={`relative hidden md:flex flex-col justify-between p-12 overflow-hidden ${isDark ? "bg-[#18181b]" : "bg-gradient-to-br from-[#F54D27] to-[#ff7e5f]"}`}>
+                    <div className="relative z-10">
+                        <h2 className="text-white text-3xl font-black italic tracking-tighter uppercase">CORE<span className="opacity-70 text-gray-900">CART</span></h2>
+                    </div>
+
+                    <div className="relative z-10">
+                        <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+                            <Image
+                                src="/img/login.jpg" // Using your image path
+                                alt="Shop Signup"
+                                width={500}
+                                height={500}
+                                className="w-full max-w-sm mx-auto rounded-3xl shadow-2xl -rotate-2 hover:rotate-0 transition-transform duration-500"
+                                priority
+                            />
+                        </motion.div>
+                        <div className="mt-8 text-white/90">
+                            <h3 className="text-2xl font-bold">Start Your Journey.</h3>
+                            <p className="text-sm text-white/60 mt-2">Create an account to track orders and earn points.</p>
+                        </div>
+                    </div>
+
+                    <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
                 </div>
 
-                {/* RIGHT FORM */}
-                <div className="p-8 sm:p-10 flex flex-col justify-center">
-                    <h1
-                        className={`text-3xl font-bold text-center mb-6 ${isDark ? "text-gray-100" : "text-gray-900"
-                            }`}
-                    >
-                        Create Account
-                    </h1>
+                {/* RIGHT SIDE: Signup Form */}
+                <div className="p-8 md:p-16 flex flex-col justify-center">
+                    <div className="mb-8 text-center md:text-left">
+                        <h1 className={`text-4xl font-black tracking-tight mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>Join Us</h1>
+                        <p className={`text-sm font-medium ${isDark ? "text-gray-500" : "text-gray-400"}`}>Create your shopping account today.</p>
+                    </div>
 
-                    {message && (
-                        <p className="text-center mb-4 text-sm text-red-500">{message}</p>
-                    )}
+                    <AnimatePresence>
+                        {message && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                                className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-bold flex items-center gap-2"
+                            >
+                                {message}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     <form className="space-y-4" onSubmit={handleSubmit}>
-                        <input
-                            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#F54D27] transition placeholder-gray-400 ${isDark
-                                ? "border-gray-600 bg-gray-700 text-gray-100"
-                                : "border-gray-300 bg-white text-gray-900"
-                                }`}
-                            placeholder="Name"
-                            value={form.name}
-                            onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        />
-
-                        <input
-                            type="email"
-                            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#F54D27] transition placeholder-gray-400 ${isDark
-                                ? "border-gray-600 bg-gray-700 text-gray-100"
-                                : "border-gray-300 bg-white text-gray-900"
-                                }`}
-                            placeholder="Email"
-                            value={form.email}
-                            onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        />
-
-                        <div className="relative">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#F54D27] transition placeholder-gray-400 ${isDark
-                                    ? "border-gray-600 bg-gray-700 text-gray-100"
-                                    : "border-gray-300 bg-white text-gray-900"
-                                    }`}
-                                placeholder="Password"
-                                value={form.password}
-                                onChange={(e) =>
-                                    setForm({ ...form, password: e.target.value })
-                                }
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                            >
-                                {showPassword ? "Hide" : "Show"}
-                            </button>
+                        {/* Name Input */}
+                        <div className="space-y-1">
+                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? "text-gray-500" : "text-gray-400"}`}>Full Name</label>
+                            <div className="relative group">
+                                <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${isDark ? "text-gray-600 group-focus-within:text-[#F54D27]" : "text-gray-300 group-focus-within:text-[#F54D27]"}`} />
+                                <input
+                                    type="text"
+                                    placeholder="John Doe"
+                                    value={form.name}
+                                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                                    required
+                                    className={`w-full pl-12 pr-4 py-3.5 rounded-2xl outline-none transition-all font-bold text-sm border ${isDark ? "bg-white/5 border-white/5 text-white focus:border-[#F54D27]" : "bg-gray-50 border-gray-100 focus:border-[#F54D27]"
+                                        }`}
+                                />
+                            </div>
                         </div>
 
-                        <div className="flex items-center space-x-2">
+                        {/* Email Input */}
+                        <div className="space-y-1">
+                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? "text-gray-500" : "text-gray-400"}`}>Email Address</label>
+                            <div className="relative group">
+                                <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${isDark ? "text-gray-600 group-focus-within:text-[#F54D27]" : "text-gray-300 group-focus-within:text-[#F54D27]"}`} />
+                                <input
+                                    type="email"
+                                    placeholder="john@example.com"
+                                    value={form.email}
+                                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                                    required
+                                    className={`w-full pl-12 pr-4 py-3.5 rounded-2xl outline-none transition-all font-bold text-sm border ${isDark ? "bg-white/5 border-white/5 text-white focus:border-[#F54D27]" : "bg-gray-50 border-gray-100 focus:border-[#F54D27]"
+                                        }`}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Password Input */}
+                        <div className="space-y-1">
+                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isDark ? "text-gray-500" : "text-gray-400"}`}>Password</label>
+                            <div className="relative group">
+                                <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${isDark ? "text-gray-600 group-focus-within:text-[#F54D27]" : "text-gray-300 group-focus-within:text-[#F54D27]"}`} />
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="••••••••"
+                                    value={form.password}
+                                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                                    required
+                                    className={`w-full pl-12 pr-12 py-3.5 rounded-2xl outline-none transition-all font-bold text-sm border ${isDark ? "bg-white/5 border-white/5 text-white focus:border-[#F54D27]" : "bg-gray-50 border-gray-100 focus:border-[#F54D27]"
+                                        }`}
+                                />
+                                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Terms Checkbox */}
+                        <div className="flex items-center gap-2 py-2">
                             <input
                                 type="checkbox"
                                 checked={agree}
                                 onChange={() => setAgree(!agree)}
-                                className="h-4 w-4 text-[#F54D27] focus:ring-[#F54D27] border-gray-300 rounded"
+                                className="w-4 h-4 rounded border-gray-300 text-[#F54D27] focus:ring-[#F54D27]"
                             />
-                            <label
-                                className={`text-sm ${isDark ? "text-gray-300" : "text-gray-700"
-                                    }`}
-                            >
-                                I agree to the{" "}
-                                <Link href="/terms" className="text-[#F54D27] hover:underline">
-                                    Terms & Conditions
-                                </Link>
-                            </label>
+                            <p className={`text-xs font-bold ${isDark ? "text-gray-500" : "text-gray-600"}`}>
+                                I accept the <Link href="/terms" className="text-[#F54D27] underline">Terms & Conditions</Link>
+                            </p>
                         </div>
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`w-full py-3 mt-2 text-white font-semibold rounded-lg shadow-md transition-all duration-300 ${loading
-                                ? "opacity-50 cursor-not-allowed bg-[#F54D27]"
-                                : "bg-[#F54D27] hover:bg-[#e04322]"
+                            className={`w-full py-4 rounded-2xl font-black text-white text-sm tracking-widest transition-all shadow-xl flex justify-center items-center gap-3 active:scale-[0.98] ${loading ? "bg-gray-600 cursor-not-allowed" : "bg-[#F54D27] hover:bg-[#e04322] shadow-[#F54D27]/20 group"
                                 }`}
                         >
-                            {loading ? "Signing up..." : "Sign Up"}
+                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                                <>
+                                    CREATE ACCOUNT
+                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                </>
+                            )}
                         </button>
                     </form>
 
-                    <p
-                        className={`text-center text-sm mt-4 ${isDark ? "text-gray-300" : "text-gray-500"
-                            }`}
-                    >
-                        Already have an account?{" "}
-                        <Link
-                            href="/login"
-                            className="text-[#F54D27] font-semibold hover:underline"
-                        >
-                            Login
-                        </Link>
-                    </p>
-
-                    <p
-                        className={`text-center text-xs mt-6 ${isDark ? "text-gray-400" : "text-gray-500"
-                            }`}
-                    >
-                        &copy; 2026 YourShop. All rights reserved.
-                    </p>
+                    <div className="mt-8 text-center">
+                        <p className={`text-sm font-bold ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+                            Already a member? <Link href="/login" className="text-[#F54D27] hover:underline decoration-2 underline-offset-4">Sign In</Link>
+                        </p>
+                    </div>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 }
