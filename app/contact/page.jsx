@@ -6,8 +6,8 @@ export default function page() {
                 <p className="text-lg font-bold">Soyab Akhtar</p>
                 <p><strong>GSTIN:</strong> 06ESSPA3443R1Z4</p>
                 <p><strong>Address:</strong> Kanwarsika Bus Stop, Nuh Road, Roz Ka Meo Industrial Area, Nuh, Haryana - 122103</p>
-                <p><strong>Email:</strong> [Aapka Support Email Yahan Likhein]</p>
-                <p><strong>Phone:</strong> [Aapka Phone Number Yahan Likhein]</p>
+                <p><strong>Email:</strong> Upay19755@gmail.com</p>
+                <p><strong>Phone:</strong> 9728983194</p>
             </div>
         </div>
     );

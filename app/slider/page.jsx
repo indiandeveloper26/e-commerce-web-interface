@@ -1,116 +1,69 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-export default function FastAutoSlider() {
+export default function ProductSlider({ products = [] }) {
     const router = useRouter();
-    const [products, setProducts] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [itemsPerView, setItemsPerView] = useState(3);
-    const [isHovered, setIsHovered] = useState(false);
+    const [itemsPerView, setItemsPerView] = useState(2);
 
-    // Initial Data Fetch
+    // Responsive
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth < 640) setItemsPerView(1.5);
-            else if (window.innerWidth < 1024) setItemsPerView(2);
-            else setItemsPerView(3);
+            if (window.innerWidth < 640) setItemsPerView(2);
+            else if (window.innerWidth < 1024) setItemsPerView(3);
+            else setItemsPerView(4);
         };
         handleResize();
         window.addEventListener("resize", handleResize);
-
-        fetch("/api/productdata")
-            .then((res) => res.json())
-            .then((data) => setProducts(data.data || []))
-            .catch(() => {
-                // Dummy data if API fails
-                setProducts(Array(8).fill(null).map((_, i) => ({
-                    _id: `${i}`,
-                    name: `Flash Item ${i + 1}`,
-                    price: 999 + i * 100,
-                    images: ["/placeholder.png"],
-                    slug: "product-link"
-                })));
-            });
-
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    // 0.5 SECOND AUTO-SLIDE LOGIC
-    const maxIndex = products.length > 0 ? products.length - Math.ceil(itemsPerView) : 0;
-
+    // Auto-slide
     useEffect(() => {
-        if (isHovered || products.length === 0) return;
-
+        if (!products || products.length === 0) return;
         const interval = setInterval(() => {
-            setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
-        }, 1000); // 0.5 Seconds
-
+            setCurrentIndex((prev) => (prev >= products.length - itemsPerView ? 0 : prev + 1));
+        }, 3000);
         return () => clearInterval(interval);
-    }, [maxIndex, isHovered, products.length]);
+    }, [products, itemsPerView]);
+
+    if (!products || products.length === 0) return null;
 
     return (
-        <div
-            className="w-full max-w-7xl mx-auto py-6 px-4"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            <div className="flex items-center gap-3 mb-6 px-2">
-                <div className="flex items-center gap-2 bg-[#F54D27]/10 px-3 py-1 rounded-full">
-                    <Zap size={14} className="text-[#F54D27] fill-[#F54D27]" />
-                    <span className="text-[#F54D27] font-black text-[10px] uppercase tracking-widest">Live Feed</span>
-                </div>
-                <div className="h-[1px] flex-grow bg-gray-100"></div>
-            </div>
-
-            <div className="overflow-hidden rounded-[2rem]">
-                <motion.div
-                    className="flex"
-                    animate={{ x: `-${currentIndex * (100 / itemsPerView)}%` }}
-                    transition={{
-                        type: "spring",
-                        stiffness: 500, // Instant snap
-                        damping: 50,   // No shaking
-                        mass: 0.9      // Very light feel
-                    }}
-                >
-                    {products.map((product) => (
+        <div className="overflow-hidden rounded-2xl">
+            <motion.div
+                className="flex"
+                animate={{ x: `-${currentIndex * (100 / itemsPerView)}%` }}
+                transition={{ type: "tween", duration: 0.8, ease: "easeInOut" }}
+            >
+                {products.map((product) => (
+                    <div
+                        key={product._id}
+                        className="flex-none px-2"
+                        style={{ width: `${100 / itemsPerView}%` }}
+                    >
                         <div
-                            key={product._id}
-                            className="flex-none px-2"
-                            style={{ width: `${100 / itemsPerView}%` }}
+                            onClick={() => router.push(`/products/${product.slug}`)}
+                            className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm cursor-pointer hover:shadow-lg transition-shadow duration-300"
                         >
-                            <div
-                                onClick={() => router.push(`/products/${product.slug}`)}
-                                className="group cursor-pointer bg-white rounded-3xl overflow-hidden border border-gray-50 shadow-sm hover:border-[#F54D27] transition-colors duration-200"
-                            >
-                                <div className="aspect-[4/3] bg-gray-50 relative">
-                                    <img
-                                        src={product.images[0]}
-                                        className="w-full h-full object-cover"
-                                        alt=""
-                                    />
-                                    {/* Glass Overlay on Hover */}
-                                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                        <div className="bg-white/90 backdrop-blur-sm p-2 rounded-full text-[#F54D27]">
-                                            <Zap size={20} fill="#F54D27" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="p-4 bg-white">
-                                    <h3 className="font-bold text-gray-900 text-sm truncate uppercase tracking-tighter">
-                                        {product.name}
-                                    </h3>
-                                    <p className="text-[#F54D27] font-black italic mt-1 text-sm">₹{product.price}</p>
-                                </div>
+                            <div className="aspect-[4/5] w-full overflow-hidden relative">
+                                <img
+                                    src={product.images?.[0] || "/placeholder.png"}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                                />
+                            </div>
+                            <div className="p-4 text-center">
+                                <h3 className="text-sm font-bold truncate">{product.name}</h3>
+                                <p className="text-[#F54D27] font-black mt-1">₹{product.discountPrice || product.price}</p>
                             </div>
                         </div>
-                    ))}
-                </motion.div>
-            </div>
+                    </div>
+                ))}
+            </motion.div>
         </div>
     );
 }

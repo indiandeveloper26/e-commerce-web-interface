@@ -1,11 +1,11 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { ShoppingBag, Box, Sun, Moon, LogOut, Menu, X, User, LayoutGrid } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
+import { ShoppingBag, Box, Sun, Moon, LogOut, Menu, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "../Redux/contextapi";
-import Link from "next/link";
 import { logout } from "../Redux/authslice";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -15,11 +15,15 @@ export default function Header() {
     const router = useRouter();
     const pathname = usePathname();
     const dispatch = useDispatch();
-
     const { isLoggedIn } = useSelector((state) => state.auth);
     const { theme, toggleTheme } = useTheme();
 
-    // Handle scroll effect for a modern sticky feel
+    const navLinks = [
+        { name: "Home", href: "/" },
+        { name: "Products", href: "/products" },
+        { name: "Collection", href: "/itemlist" },
+    ];
+
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener("scroll", handleScroll);
@@ -33,121 +37,138 @@ export default function Header() {
         setIsOpen(false);
     };
 
-    const navLinks = [
-        { name: "Home", href: "/" },
-        { name: "Products", href: "/products" },
-        { name: "Collection", href: "/itemlist" },
-    ];
-
     return (
-        <header className={`sticky top-0 z-[100] transition-all duration-300 ${scrolled
-            ? "py-3 bg-white/80 dark:bg-[#0f1115]/80 backdrop-blur-xl shadow-2xl border-b border-gray-200 dark:border-gray-800"
-            : "py-5 bg-[#F54D27] text-white"
-            }`}>
+        <header
+            className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
+                ? "py-3 bg-[#F54D27] shadow-lg" // SCROLLED: still ORANGE
+                : "py-5 bg-[#F54D27]" // NORMAL: ORANGE
+                }`}
+        >
             <div className="container mx-auto px-6 flex justify-between items-center">
-
-                {/* Logo Section */}
-                <Link href="/" className="group flex items-center gap-2">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black italic text-xl transition-all ${scrolled ? "bg-[#F54D27] text-white rotate-3" : "bg-white text-[#F54D27] -rotate-3 group-hover:rotate-0"
-                        }`}>M</div>
-                    <span className={`text-2xl font-black italic tracking-tighter uppercase ${scrolled ? "text-gray-900 dark:text-white" : "text-white"}`}>
-                        Velora Commerce<span className={scrolled ? "text-[#F54D27]" : "text-gray-900"}>.</span>
+                {/* Logo */}
+                <Link href="/" className="flex items-center gap-2">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black italic text-xl bg-white text-[#F54D27] -rotate-3 group-hover:rotate-0">
+                        M
+                    </div>
+                    <span className="text-2xl font-black italic tracking-tighter uppercase text-white">
+                        Velora Commerce<span className="text-white">.</span>
                     </span>
                 </Link>
 
-                {/* Desktop Navigation */}
+                {/* Desktop Nav */}
                 <nav className="hidden lg:flex items-center gap-8">
                     {navLinks.map((link) => (
                         <Link
                             key={link.name}
                             href={link.href}
-                            className={`text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:opacity-100 ${pathname === link.href ? "opacity-100 text-[#F54D27]" : "opacity-50"
-                                } ${!scrolled && "text-white opacity-80 hover:opacity-100"}`}
+                            className={`text-[11px] font-black uppercase tracking-[0.2em] text-white opacity-80 hover:opacity-100 ${pathname === link.href ? "opacity-100" : ""
+                                }`}
                         >
                             {link.name}
                         </Link>
                     ))}
                 </nav>
 
-                {/* Action Icons */}
+                {/* Actions */}
                 <div className="flex items-center gap-3">
-                    {/* Theme Toggle */}
                     <button
                         onClick={toggleTheme}
-                        className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${scrolled ? "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" : "bg-white/20 text-white"
-                            }`}
+                        className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white/20 text-white"
                     >
                         {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
                     </button>
 
-                    {/* Desktop Only Actions */}
                     <div className="hidden md:flex items-center gap-3">
                         {isLoggedIn ? (
                             <>
-                                <button onClick={() => router.push("/orders")} className={`nav-icon-btn ${scrolled ? "bg-gray-100 dark:bg-gray-800" : "bg-white/20"}`}>
+                                <button onClick={() => router.push("/orders")} className="nav-icon-btn text-white">
                                     <Box size={18} />
                                 </button>
-                                <button onClick={() => router.push("/cart")} className={`nav-icon-btn relative ${scrolled ? "bg-gray-100 dark:bg-gray-800" : "bg-white/20"}`}>
+                                <button onClick={() => router.push("/cart")} className="nav-icon-btn relative text-white">
                                     <ShoppingBag size={18} />
-                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-gray-900 text-white text-[8px] font-black rounded-full flex items-center justify-center">2</span>
+                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-white text-[#F54D27] text-[8px] font-black rounded-full flex items-center justify-center">
+                                        2
+                                    </span>
                                 </button>
-                                <button onClick={handleLogout} className="ml-2 p-2 hover:text-red-500 transition-colors">
+                                <button onClick={handleLogout} className="ml-2 p-2 text-white hover:text-gray-200 transition-colors">
                                     <LogOut size={18} />
                                 </button>
                             </>
                         ) : (
-                            <Link href="/login" className={`px-6 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${scrolled ? "bg-gray-900 text-white hover:bg-[#F54D27]" : "bg-white text-[#F54D27] hover:bg-gray-100"
-                                }`}>
+                            <Link
+                                href="/login"
+                                className="px-6 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-widest bg-white/20 text-white hover:bg-white/30 transition-all"
+                            >
                                 Sign In
                             </Link>
                         )}
                     </div>
 
-                    {/* Mobile Menu Trigger */}
-                    <button
-                        onClick={() => setIsOpen(!isOpen)}
-                        className={`lg:hidden w-10 h-10 rounded-2xl flex items-center justify-center ${scrolled ? "text-gray-900 dark:text-white" : "text-white"}`}
-                    >
+                    {/* Mobile Menu */}
+                    <button onClick={() => setIsOpen(!isOpen)} className="lg:hidden w-10 h-10 flex items-center justify-center text-white">
                         {isOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
                 </div>
             </div>
 
-            {/* Mobile Sidebar Overlay */}
+            {/* Mobile Overlay */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, x: 100 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 100 }}
-                        className="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-[#0f1115] shadow-2xl z-[110] p-10 flex flex-col"
+                        initial={{ x: "100%" }}
+                        animate={{ x: 0 }}
+                        exit={{ x: "100%" }}
+                        transition={{ type: "tween", duration: 0.3 }}
+                        className="fixed top-0 right-0 bottom-0 w-full sm:w-80 bg-[#F54D27] z-50 p-6 flex flex-col overflow-y-auto text-white"
                     >
-                        <div className="flex justify-between items-center mb-16">
-                            <span className="font-black italic text-2xl uppercase tracking-tighter">Menu<span className="text-[#F54D27]">.</span></span>
-                            <button onClick={() => setIsOpen(false)} className="p-2 bg-gray-100 dark:bg-gray-800 rounded-xl"><X size={20} /></button>
+                        <div className="flex justify-between items-center mb-12">
+                            <span className="font-black italic text-2xl uppercase tracking-tighter text-white">
+                                Menu<span className="text-white">.</span>
+                            </span>
+                            <button onClick={() => setIsOpen(false)} className="p-2 bg-white/20 rounded-xl">
+                                <X size={20} />
+                            </button>
                         </div>
 
-                        <div className="flex flex-col gap-8">
+                        <div className="flex flex-col gap-6">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.name}
                                     href={link.href}
                                     onClick={() => setIsOpen(false)}
-                                    className="text-4xl font-black italic tracking-tighter uppercase hover:text-[#F54D27] transition-colors"
+                                    className="text-2xl font-bold uppercase hover:text-white/80 transition-colors"
                                 >
                                     {link.name}
                                 </Link>
                             ))}
-                            <hr className="border-gray-100 dark:border-gray-800" />
-                            <Link href="/orders" onClick={() => setIsOpen(false)} className="flex items-center gap-4 text-xl font-bold uppercase tracking-widest opacity-50"><Box /> My Orders</Link>
-                            <Link href="/cart" onClick={() => setIsOpen(false)} className="flex items-center gap-4 text-xl font-bold uppercase tracking-widest opacity-50"><ShoppingBag /> Cart</Link>
+                            {isLoggedIn && (
+                                <>
+                                    <Link href="/orders" onClick={() => setIsOpen(false)} className="flex items-center gap-4 text-xl font-bold opacity-80">
+                                        <Box /> My Orders
+                                    </Link>
+                                    <Link href="/cart" onClick={() => setIsOpen(false)} className="flex items-center gap-4 text-xl font-bold opacity-80">
+                                        <ShoppingBag /> Cart
+                                    </Link>
+                                </>
+                            )}
                         </div>
 
                         <div className="mt-auto">
                             {!isLoggedIn ? (
-                                <Link href="/login" onClick={() => setIsOpen(false)} className="block w-full py-5 bg-[#F54D27] text-white text-center rounded-[2rem] font-black uppercase tracking-widest">Login</Link>
+                                <Link
+                                    href="/login"
+                                    onClick={() => setIsOpen(false)}
+                                    className="block w-full py-4 bg-white/20 text-white text-center rounded-2xl font-black uppercase"
+                                >
+                                    Login
+                                </Link>
                             ) : (
-                                <button onClick={handleLogout} className="w-full py-5 bg-gray-100 dark:bg-gray-800 rounded-[2rem] font-black uppercase tracking-widest">Logout</button>
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full py-4 bg-white/20 text-white rounded-2xl font-black uppercase"
+                                >
+                                    Logout
+                                </button>
                             )}
                         </div>
                     </motion.div>
