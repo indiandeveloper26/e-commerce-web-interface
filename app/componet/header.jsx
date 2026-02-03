@@ -51,7 +51,7 @@ export default function Header() {
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black italic text-xl transition-all ${scrolled ? "bg-[#F54D27] text-white rotate-3" : "bg-white text-[#F54D27] -rotate-3 group-hover:rotate-0"
                         }`}>M</div>
                     <span className={`text-2xl font-black italic tracking-tighter uppercase ${scrolled ? "text-gray-900 dark:text-white" : "text-white"}`}>
-                        MyApp<span className={scrolled ? "text-[#F54D27]" : "text-gray-900"}>.</span>
+                        Velora Commerce<span className={scrolled ? "text-[#F54D27]" : "text-gray-900"}>.</span>
                     </span>
                 </Link>
 

@@ -32,7 +32,7 @@ export const config = {
     matcher: [
         '/about/:path*',
         '/itemlist/:path*',
-        '/contact',          // you can also match exact paths
+        // you can also match exact paths
     ],
 };
 
