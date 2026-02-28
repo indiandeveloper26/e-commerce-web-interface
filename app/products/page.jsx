@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchProducts, setProductsFromStorage } from "../Redux/productsSlice";
 import { useRouter } from "next/navigation";
-// Updated slider
+import { useTheme } from "../Redux/contextapi";
 import ProductSkeletonCard from "../componet/skeliton";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ShoppingBag, Filter, Star, ArrowUpRight } from "lucide-react";
@@ -13,8 +13,10 @@ import ProductSlider from "../slider/page";
 export default function ProductsClient() {
     const router = useRouter();
     const dispatch = useDispatch();
-    const { products, loading, error, loaded } = useSelector((state) => state.products);
+    const { theme } = useTheme();
+    const isDark = theme === "dark";
 
+    const { products, loading, error, loaded } = useSelector((state) => state.products);
     const [filtered, setFiltered] = useState([]);
     const [search, setSearch] = useState("");
 
@@ -36,122 +38,149 @@ export default function ProductsClient() {
     }, [search, products]);
 
     if (loading) return <ProductSkeletonCard />;
-    if (error)
-        return (
-            <div className="flex flex-col items-center justify-center min-h-screen">
-                <p className="text-[#F54D27] font-bold text-xl">Oops! {error}</p>
-            </div>
-        );
+    if (error) return (
+        <div className={`flex flex-col items-center justify-center min-h-screen ${isDark ? "bg-[#0a0a0b]" : "bg-white"}`}>
+            <p className="text-[#F54D27] font-black text-2xl uppercase tracking-tighter">Oops! {error}</p>
+        </div>
+    );
 
     return (
-        <section className="bg-white min-h-screen font-sans selection:bg-[#F54D27]/10">
-            {/* Header */}
-            <div className="bg-[#fafafa] border-b border-gray-100 pt-16 pb-12">
-                <div className="container mx-auto px-4 text-center">
+        <section className={`min-h-screen font-sans selection:bg-[#F54D27]/20 transition-colors duration-500 ${isDark ? "bg-[#0a0a0b] text-white" : "bg-white text-gray-900"}`}>
+
+            {/* --- HERO HEADER --- */}
+            <div className={`${isDark ? "bg-[#121214] border-white/5" : "bg-[#fafafa] border-gray-100"} border-b pt-20 pb-16 transition-colors`}>
+                <div className="container mx-auto px-6 text-center lg:max-w-4xl"> {/* PC pe header thoda narrow kiya */}
                     <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-                        <h1 className="text-5xl font-black text-gray-900 tracking-tight mb-4 lowercase">
+                        <h1 className={`text-5xl md:text-7xl font-black tracking-tight mb-4 lowercase ${isDark ? "text-white" : "text-gray-900"}`}>
                             Curated<span className="text-[#F54D27]"> Collections.</span>
                         </h1>
-                        <p className="text-gray-500 max-w-lg mx-auto font-medium">
-                            Premium essentials designed for the modern lifestyle.
+                        <p className={`max-w-lg mx-auto font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                            Premium essentials designed for the modern lifestyle. Experience the core of quality.
                         </p>
                     </motion.div>
 
-                    {/* Search */}
-                    <div className="mt-10 flex justify-center px-4">
+                    {/* Search Container */}
+                    <div className="mt-12 flex justify-center px-4">
                         <div className="relative w-full max-w-2xl group">
-                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#F54D27] transition-colors" />
+                            <Search className={`absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${isDark ? "text-gray-500 group-focus-within:text-white" : "text-gray-400 group-focus-within:text-[#F54D27]"}`} />
                             <input
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Search products, brands, or categories..."
-                                className="w-full pl-14 pr-6 py-5 bg-white border border-gray-100 rounded-[2rem] shadow-sm 
-                                    focus:outline-none focus:ring-4 focus:ring-[#F54D27]/5 focus:border-[#F54D27]
-                                    text-gray-900 font-medium transition-all duration-300"
+                                placeholder="Search products..."
+                                className={`w-full pl-16 pr-8 py-6 rounded-[2.5rem] shadow-2xl outline-none transition-all duration-300 font-bold text-sm
+                                    ${isDark ? "bg-[#1c1c1f] border-white/5 text-white" : "bg-white border-gray-100 shadow-gray-200/50"}`}
                             />
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-12">
-                {/* Slider Section */}
-                <div className="mb-20">
-                    <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-xl font-black uppercase tracking-widest text-gray-900">Featured Releases</h2>
-                        <div className="h-[2px] flex-grow mx-8 bg-gray-50 hidden md:block" />
+            {/* Main Content Area */}
+            <div className="container mx-auto px-6 py-16">
+
+                {/* --- SLIDER SECTION (PC: Balanced Spacing) --- */}
+                <div className="mb-24 lg:px-12"> {/* PC par slider ke side mein padding badha di */}
+                    <div className="flex flex-col items-center mb-12">
+                        <h2 className="text-xs font-black uppercase tracking-[0.4em] opacity-40 mb-3">Featured Releases</h2>
+                        <div className={`h-[2px] w-20 ${isDark ? "bg-white/10" : "bg-[#F54D27]/20"}`} />
                     </div>
-                    <ProductSlider products={products} />
+
+                    {/* Slider is now centered with a clean layout */}
+                    <div className="flex justify-center">
+                        <ProductSlider products={products} />
+                    </div>
                 </div>
 
-                {/* Grid Header */}
-                <div className="flex items-center justify-between mb-10">
-                    <h3 className="text-2xl font-black text-gray-900">Discover All ({filtered.length})</h3>
-                    <button className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-100 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all">
-                        <Filter className="w-4 h-4" /> Filter
+                {/* --- GRID HEADER --- */}
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-16 border-t pt-16 border-gray-100 dark:border-white/5">
+                    <h3 className="text-3xl font-black tracking-tighter uppercase italic text-center md:text-left">
+                        Discover All <span className="text-[#F54D27] not-italic">({filtered.length})</span>
+                    </h3>
+                    <button className={`flex items-center gap-2 px-8 py-4 rounded-full border text-[10px] font-black uppercase tracking-[0.2em] transition-all
+                        ${isDark ? "border-white/10 text-white hover:bg-white/5" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+                        <Filter className="w-4 h-4" /> Filter Catalog
                     </button>
                 </div>
 
-                {/* Products Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
+                {/* --- PRODUCTS GRID --- */}
+                {/* --- PRODUCTS GRID --- */}
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
                     <AnimatePresence mode="popLayout">
                         {filtered.length > 0 ? (
                             filtered.map((product, index) => (
                                 <motion.div
                                     layout
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: index * 0.05 }}
                                     key={product._id}
                                     onClick={() => router.push(`/products/${product.slug}`)}
-                                    className="group relative bg-white flex flex-col cursor-pointer"
+                                    className={`group relative flex flex-col rounded-[2.5rem] p-3 transition-all duration-500 cursor-pointer
+                        ${isDark
+                                            ? "bg-[#111112] border border-white/5 hover:bg-[#161618] hover:shadow-[0_20px_40px_rgba(0,0,0,0.7)]"
+                                            : "bg-white border border-gray-100 shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-2"
+                                        }`}
                                 >
-                                    {/* Image */}
-                                    <div className="aspect-[4/5] w-full overflow-hidden rounded-[2rem] bg-gray-100 relative shadow-sm group-hover:shadow-2xl group-hover:shadow-[#F54D27]/10 transition-all duration-500">
+                                    {/* Product Image Wrapper */}
+                                    <div className="relative aspect-[1/1.1] w-full overflow-hidden rounded-[2rem]">
                                         <img
                                             src={product.images?.[0] || "/placeholder.png"}
                                             alt={product.name}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         />
-                                        <div className="absolute top-4 left-4">
-                                            <span className="bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter text-gray-900 flex items-center gap-1 shadow-sm">
-                                                <Star className="w-3 h-3 text-[#F54D27] fill-[#F54D27]" /> 4.9
+
+                                        {/* Discount or New Badge */}
+                                        <div className="absolute top-3 left-3">
+                                            <span className="bg-[#F54D27] text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
+                                                New
                                             </span>
                                         </div>
-                                        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-xl">
-                                                <ArrowUpRight className="w-6 h-6 text-[#F54D27]" />
-                                            </div>
+
+                                        {/* Floating Action Button (Cart) */}
+                                        <div className="absolute bottom-4 right-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                                            <button className="w-10 h-10 bg-white dark:bg-black rounded-full flex items-center justify-center shadow-2xl hover:bg-[#F54D27] hover:text-white transition-colors">
+                                                <ShoppingBag size={18} />
+                                            </button>
                                         </div>
                                     </div>
 
-                                    {/* Details */}
-                                    <div className="pt-5 px-2">
+                                    {/* Product Details Area */}
+                                    <div className="mt-5 px-2 pb-2">
                                         <div className="flex justify-between items-start mb-1">
-                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">{product.category}</h4>
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-[#F54D27] opacity-80">
+                                                {product.category || "Premium"}
+                                            </span>
+                                            <div className="flex items-center gap-1">
+                                                <Star size={10} className="fill-[#F54D27] text-[#F54D27]" />
+                                                <span className="text-[10px] font-bold opacity-50">4.8</span>
+                                            </div>
                                         </div>
-                                        <h2 className="text-lg font-bold text-gray-900 truncate group-hover:text-[#F54D27] transition-colors">{product.name}</h2>
-                                        <div className="mt-3 flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xl font-black text-gray-900 italic">₹{product.discountPrice || product.price}</span>
+
+                                        <h2 className={`text-sm font-bold truncate mb-3 ${isDark ? "text-white" : "text-gray-900"}`}>
+                                            {product.name}
+                                        </h2>
+
+                                        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-white/5">
+                                            <div className="flex flex-col">
+                                                <span className="text-lg font-black tracking-tight leading-none">
+                                                    ₹{product.discountPrice || product.price}
+                                                </span>
                                                 {product.discountPrice && (
-                                                    <span className="line-through text-gray-300 text-xs font-bold">₹{product.price}</span>
+                                                    <span className="text-[10px] opacity-30 line-through font-bold">₹{product.price}</span>
                                                 )}
                                             </div>
-                                            <button
-                                                onClick={(e) => e.stopPropagation()}
-                                                className="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center text-white hover:bg-[#F54D27] transition-all duration-300 shadow-lg active:scale-90"
-                                            >
-                                                <ShoppingBag className="w-5 h-5" />
-                                            </button>
+
+                                            <div className={`text-[10px] font-black uppercase tracking-tighter px-3 py-1 rounded-lg ${isDark ? "bg-white/5 text-white/40" : "bg-gray-100 text-gray-400"}`}>
+                                                Details
+                                            </div>
                                         </div>
                                     </div>
                                 </motion.div>
                             ))
                         ) : (
-                            <div className="col-span-full py-20 text-center">
-                                <p className="text-gray-400 font-bold text-xl uppercase tracking-widest">No matching items found</p>
+                            <div className="col-span-full py-32 text-center">
+                                <p className="opacity-20 font-black text-4xl uppercase tracking-tighter italic">No Items Found</p>
                             </div>
                         )}
                     </AnimatePresence>

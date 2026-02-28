@@ -31,6 +31,7 @@ export default function OrdersPage() {
             setLoading(true);
             try {
                 const res = await axios.get(`/api/order/orderdata/${userId}`);
+                console.log('res', res)
                 if (res.data.success) {
                     setOrders(res.data.data.orders || []);
                 }

@@ -108,7 +108,7 @@ export default function CartPage() {
                                             exit={{ opacity: 0, x: 20 }}
                                             className={`relative group rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 items-center transition-all ${isDark ? "bg-gray-800/40 hover:bg-gray-800" : "bg-white shadow-sm hover:shadow-xl"}`}
                                         >
-                                            <div className="relative w-32 h-32 rounded-[2rem] overflow-hidden bg-gray-100 flex-shrink-0">
+                                            <div onClick={() => router.push(`/products/${item?.product?.slug}`)} className="relative w-32 h-32 rounded-[2rem] overflow-hidden bg-gray-100 flex-shrink-0">
                                                 <Image
                                                     src={item.product?.images?.[0] || "/placeholder.png"}
                                                     alt="" fill className="object-cover group-hover:scale-110 transition-transform duration-500"

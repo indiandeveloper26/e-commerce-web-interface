@@ -15,7 +15,7 @@ export async function GET() {
         const user = await Usercrate.findById("697e0e5fa0d232f01b9c7ac2")
         return NextResponse.json({ "data": user })
     } catch (error) {
-        return NextResponse.json({ "error": "api v-1tt" })
+        return NextResponse.json({ "error": user })
     }
 
 

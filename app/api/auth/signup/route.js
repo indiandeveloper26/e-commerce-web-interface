@@ -1,73 +1,73 @@
-// import bcrypt from "bcryptjs";
-// import dbConnect from "../../../lib/mongodb";
-// import Usercrate from "../../../models/User";
-// import { NextResponse } from "next/server";
+// // import bcrypt from "bcryptjs";
+// // import dbConnect from "../../../lib/mongodb";
+// // import Usercrate from "../../../models/User";
+// // import { NextResponse } from "next/server";
 
-// export async function POST(request) {
-//     try {
-//         const body = await request.json();
-//         const { name, email, password, phoneNumber } = body;
+// // export async function POST(request) {
+// //     try {
+// //         const body = await request.json();
+// //         const { name, email, password, phoneNumber } = body;
 
-//         console.log("Request body:", body);
+// //         console.log("Request body:", body);
 
-//         // Validate required fields
-//         if (!name || !email || !password) {
-//             return new NextResponse(
-//                 JSON.stringify({ error: "Name, email, and password are required." }),
-//                 { status: 400 }
-//             );
-//         }
+// //         // Validate required fields
+// //         if (!name || !email || !password) {
+// //             return new NextResponse(
+// //                 JSON.stringify({ error: "Name, email, and password are required." }),
+// //                 { status: 400 }
+// //             );
+// //         }
 
-//         // Connect to MongoDB
-//         await dbConnect();
+// //         // Connect to MongoDB
+// //         await dbConnect();
 
-//         // Check if user already exists
-//         const existingUser = await Usercrate.findOne({ email });
-//         if (existingUser) {
-//             return new NextResponse(
-//                 JSON.stringify({ error: "User with this email already exists." }),
-//                 { status: 409 }
-//             );
-//         }
+// //         // Check if user already exists
+// //         const existingUser = await Usercrate.findOne({ email });
+// //         if (existingUser) {
+// //             return new NextResponse(
+// //                 JSON.stringify({ error: "User with this email already exists." }),
+// //                 { status: 409 }
+// //             );
+// //         }
 
-//         // Hash password
-//         const hashedPassword = await bcrypt.hash(password, 10);
+// //         // Hash password
+// //         const hashedPassword = await bcrypt.hash(password, 10);
 
-//         // Create new user
-//         const user = await Usercrate.create({
-//             name,
-//             email,
-//             password: hashedPassword,
-//             phoneNumber: phoneNumber || undefined, // prevent null insert
-//         });
+// //         // Create new user
+// //         const user = await Usercrate.create({
+// //             name,
+// //             email,
+// //             password: hashedPassword,
+// //             phoneNumber: phoneNumber || undefined, // prevent null insert
+// //         });
 
-//         // Return success response
-//         return new NextResponse(
-//             JSON.stringify({ message: "User created", userId: user._id }),
-//             { status: 201 }
+// //         // Return success response
+// //         return new NextResponse(
+// //             JSON.stringify({ message: "User created", userId: user._id }),
+// //             { status: 201 }
 
 
 
-//         );
-//     } catch (error) {
-//         console.error("Signup error:", error);
+// //         );
+// //     } catch (error) {
+// //         console.error("Signup error:", error);
 
-//         // Handle MongoDB duplicate key error (just in case)
-//         if (error.code === 11000) {
-//             const field = Object.keys(error.keyPattern)[0];
-//             return new NextResponse(
-//                 JSON.stringify({ error: `${field} already exists.` }),
-//                 { status: 409 }
-//             );
-//         }
+// //         // Handle MongoDB duplicate key error (just in case)
+// //         if (error.code === 11000) {
+// //             const field = Object.keys(error.keyPattern)[0];
+// //             return new NextResponse(
+// //                 JSON.stringify({ error: `${field} already exists.` }),
+// //                 { status: 409 }
+// //             );
+// //         }
 
-//         // Generic server error
-//         return new NextResponse(
-//             JSON.stringify({ error: "Internal Server Error" }),
-//             { status: 500 }
-//         );
-//     }
-// }
+// //         // Generic server error
+// //         return new NextResponse(
+// //             JSON.stringify({ error: "Internal Server Error" }),
+// //             { status: 500 }
+// //         );
+// //     }
+// // }
 
 
 
