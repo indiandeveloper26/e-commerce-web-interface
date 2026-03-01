@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
-    const [profileOpen, setProfileOpen] = useState(false); // Dropdown state
+    const [profileOpen, setProfileOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -29,7 +29,6 @@ export default function Header() {
         { name: "Collection", href: "/itemlist" },
     ];
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -50,6 +49,7 @@ export default function Header() {
         await fetch("/api/auth/logout");
         dispatch(logout());
         setProfileOpen(false);
+        setIsOpen(false);
         router.push("/login");
     };
 
@@ -77,65 +77,58 @@ export default function Header() {
                 </nav>
 
                 {/* Actions */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                     {/* Theme Toggle */}
                     <button onClick={toggleTheme} className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white/10 text-white hover:bg-white/20 transition-all">
                         {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
                     </button>
 
-                    <div className="hidden md:flex items-center gap-3">
+                    {/* ✅ Cart Icon - Ab ye Phone aur PC dono pe dikhega */}
+                    {isLoggedIn && (
+                        <button onClick={() => router.push("/cart")} className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white/10 text-white hover:bg-white/20 relative">
+                            <ShoppingBag size={18} />
+                            {userData?.cart?.length > 0 && (
+                                <span className="absolute -top-1 -right-1 w-4 h-4 bg-white text-[#F54D27] text-[8px] font-black rounded-full flex items-center justify-center border border-[#F54D27]">
+                                    {userData.cart.length}
+                                </span>
+                            )}
+                        </button>
+                    )}
+
+                    {/* Desktop Only Profile */}
+                    <div className="hidden md:block">
                         {isLoggedIn ? (
-                            <>
-                                {/* Cart Icon */}
-                                <button onClick={() => router.push("/cart")} className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white/10 text-white hover:bg-white/20 relative">
-                                    <ShoppingBag size={18} />
-                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-white text-[#F54D27] text-[8px] font-black rounded-full flex items-center justify-center">
-                                        {userData?.cart?.length || 0}
-                                    </span>
+                            <div className="relative" ref={dropdownRef}>
+                                <button
+                                    onClick={() => setProfileOpen(!profileOpen)}
+                                    className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-2xl bg-white text-[#F54D27] hover:bg-gray-100 transition-all shadow-lg active:scale-95"
+                                >
+                                    <div className="w-7 h-7 rounded-lg bg-[#F54D27] text-white flex items-center justify-center font-bold text-xs">
+                                        {userData?.name ? userData.name[0].toUpperCase() : <User size={14} />}
+                                    </div>
+                                    <ChevronDown size={14} className={`transition-transform duration-300 ${profileOpen ? "rotate-180" : ""}`} />
                                 </button>
 
-                                {/* --- USER PROFILE DROPDOWN --- */}
-                                <div className="relative" ref={dropdownRef}>
-                                    <button
-                                        onClick={() => setProfileOpen(!profileOpen)}
-                                        className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-2xl bg-white text-[#F54D27] hover:bg-gray-100 transition-all shadow-lg active:scale-95"
-                                    >
-                                        <div className="w-7 h-7 rounded-lg bg-[#F54D27] text-white flex items-center justify-center font-bold text-xs">
-                                            {userData?.name ? userData.name[0].toUpperCase() : <User size={14} />}
-                                        </div>
-                                        <ChevronDown size={14} className={`transition-transform duration-300 ${profileOpen ? "rotate-180" : ""}`} />
-                                    </button>
-
-                                    <AnimatePresence>
-                                        {profileOpen && (
-                                            <motion.div
-                                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                className="absolute right-0 mt-3 w-56 rounded-[2rem] bg-white shadow-2xl p-2 z-[60] overflow-hidden border border-gray-100"
-                                            >
-                                                <div className="px-4 py-3 border-b border-gray-50 mb-1">
-                                                    <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Signed in as</p>
-                                                    <p className="text-sm font-bold text-gray-900 truncate">{userData?.name}</p>
-                                                </div>
-
-                                                <DropdownItem icon={<User size={16} />} label="My Profile" onClick={() => { router.push('/profile'); setProfileOpen(false); }} />
-                                                <DropdownItem icon={<Box size={16} />} label="Orders" onClick={() => { router.push('/orders'); setProfileOpen(false); }} />
-                                                <DropdownItem icon={<Settings size={16} />} label="Settings" onClick={() => setProfileOpen(false)} />
-
-                                                <button
-                                                    onClick={handleLogout}
-                                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-red-500 hover:bg-red-50 font-black text-[11px] uppercase tracking-widest transition-all mt-1"
-                                                >
-                                                    <LogOut size={16} /> Logout
-                                                </button>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </div>
-                            </>
+                                <AnimatePresence>
+                                    {profileOpen && (
+                                        <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            className="absolute right-0 mt-3 w-56 rounded-[2rem] bg-white shadow-2xl p-2 z-[60] overflow-hidden border border-gray-100"
+                                        >
+                                            <div className="px-4 py-3 border-b border-gray-50 mb-1 text-gray-900">
+                                                <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Signed in as</p>
+                                                <p className="text-sm font-bold truncate">{userData?.name}</p>
+                                            </div>
+                                            <DropdownItem icon={<User size={16} />} label="My Profile" onClick={() => { router.push('/profile'); setProfileOpen(false); }} />
+                                            <DropdownItem icon={<Box size={16} />} label="Orders" onClick={() => { router.push('/orders'); setProfileOpen(false); }} />
+                                            <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-red-500 hover:bg-red-50 font-black text-[11px] uppercase tracking-widest transition-all mt-1">
+                                                <LogOut size={16} /> Logout
+                                            </button>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                         ) : (
-                            <Link href="/login" className="px-6 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-widest bg-white text-[#F54D27] hover:bg-gray-100 transition-all shadow-lg">
+                            <Link href="/login" className="px-6 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-widest bg-white text-[#F54D27] shadow-lg">
                                 Sign In
                             </Link>
                         )}
@@ -148,31 +141,35 @@ export default function Header() {
                 </div>
             </div>
 
-            {/* Mobile Overlay Code (Same as before, but with added Profile Link) */}
+            {/* --- MOBILE OVERLAY --- */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "tween", duration: 0.3 }}
-                        className="fixed top-0 right-0 bottom-0 w-full sm:w-80 bg-[#F54D27] z-50 p-6 flex flex-col text-white"
+                        className="fixed top-0 right-0 bottom-0 w-full bg-[#F54D27] z-[100] p-6 flex flex-col text-white"
                     >
                         <div className="flex justify-between items-center mb-12">
                             <span className="font-black italic text-2xl uppercase tracking-tighter">Menu</span>
-                            <button onClick={() => setIsOpen(false)} className="p-2 bg-white/20 rounded-xl"><X size={20} /></button>
+                            <button onClick={() => setIsOpen(false)} className="p-3 bg-white/20 rounded-2xl"><X size={24} /></button>
                         </div>
+
                         <div className="flex flex-col gap-6">
                             {navLinks.map((link) => (
-                                <Link key={link.name} href={link.href} onClick={() => setIsOpen(false)} className="text-2xl font-black uppercase">{link.name}</Link>
+                                <Link key={link.name} href={link.href} onClick={() => setIsOpen(false)} className="text-3xl font-black uppercase tracking-tighter">{link.name}</Link>
                             ))}
-                            {isLoggedIn && (
-                                <>
-                                    <Link href="/profile" onClick={() => setIsOpen(false)} className="flex items-center gap-4 text-xl font-bold opacity-80"><User /> My Profile</Link>
-                                    <Link href="/order" onClick={() => setIsOpen(false)} className="flex items-center gap-4 text-xl font-bold opacity-80"><Box /> My Orders</Link>
-                                    <button onClick={handleLogout} className="flex items-center gap-4 text-xl font-bold text-white/60 mt-4"><LogOut /> Logout</button>
-                                </>
-                            )}
+
+                            {/* ✅ Mobile Profile Links */}
+                            <div className="mt-6 pt-6 border-t border-white/20 flex flex-col gap-6">
+                                {isLoggedIn ? (
+                                    <>
+                                        <Link href="/profile" onClick={() => setIsOpen(false)} className="flex items-center gap-4 text-xl font-bold"><User /> My Profile</Link>
+                                        <Link href="/orders" onClick={() => setIsOpen(false)} className="flex items-center gap-4 text-xl font-bold"><Box /> My Orders</Link>
+                                        <button onClick={handleLogout} className="flex items-center gap-4 text-xl font-bold text-white/60 mt-4"><LogOut /> Logout</button>
+                                    </>
+                                ) : (
+                                    <Link href="/login" onClick={() => setIsOpen(false)} className="py-4 bg-white text-[#F54D27] text-center rounded-2xl font-black uppercase tracking-widest">Sign In</Link>
+                                )}
+                            </div>
                         </div>
-                        {!isLoggedIn && (
-                            <Link href="/login" onClick={() => setIsOpen(false)} className="mt-auto block w-full py-4 bg-white text-[#F54D27] text-center rounded-2xl font-black uppercase tracking-widest">Sign In</Link>
-                        )}
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -180,13 +177,9 @@ export default function Header() {
     );
 }
 
-// Dropdown Item Helper
 function DropdownItem({ icon, label, onClick }) {
     return (
-        <button
-            onClick={onClick}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-gray-700 hover:bg-gray-50 font-bold text-[11px] uppercase tracking-widest transition-all"
-        >
+        <button onClick={onClick} className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-gray-700 hover:bg-gray-50 font-bold text-[11px] uppercase tracking-widest transition-all">
             <span className="text-[#F54D27] opacity-70">{icon}</span>
             {label}
         </button>

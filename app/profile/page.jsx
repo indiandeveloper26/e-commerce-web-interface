@@ -285,10 +285,14 @@ export default function ProfilePage() {
 
     useEffect(() => {
         const fetchData = async () => {
+
+            console.log('userud', userid)
             if (!userid) return;
             try {
                 setLoading(true);
                 const res = await axios.get(`/api/profile/${userid}`);
+
+                console.log('userdatares', res)
 
                 if (res.data.success) {
                     setFullUser(res.data.user);

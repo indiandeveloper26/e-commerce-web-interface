@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchProducts, setProductsFromStorage } from "../Redux/productsSlice";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useTheme } from "../Redux/contextapi";
 import ProductSkeletonCard from "../componet/skeliton";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,6 +18,12 @@ export default function ProductsClient() {
     const isDark = theme === "dark";
 
     const { products, loading, error, loaded } = useSelector((state) => state.products);
+
+
+    const data = useSelector((state) => state.auth);
+
+    console.log('userdata', data)
+
     const [filtered, setFiltered] = useState([]);
     const [search, setSearch] = useState("");
 
@@ -124,27 +131,29 @@ export default function ProductsClient() {
                                 >
                                     {/* Product Image Wrapper */}
                                     <div className="relative aspect-[1/1.1] w-full overflow-hidden rounded-[2rem]">
-                                        <img
+                                        <Image
                                             src={product.images?.[0] || "/placeholder.png"}
                                             alt={product.name}
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                            fill
+                                            sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 25vw"
+                                            className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                            priority={index < 4} // 👈 above fold boost
                                         />
 
-                                        {/* Discount or New Badge */}
+                                        {/* Badge */}
                                         <div className="absolute top-3 left-3">
                                             <span className="bg-[#F54D27] text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
                                                 New
                                             </span>
                                         </div>
 
-                                        {/* Floating Action Button (Cart) */}
+                                        {/* Cart Button */}
                                         <div className="absolute bottom-4 right-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                                             <button className="w-10 h-10 bg-white dark:bg-black rounded-full flex items-center justify-center shadow-2xl hover:bg-[#F54D27] hover:text-white transition-colors">
                                                 <ShoppingBag size={18} />
                                             </button>
                                         </div>
                                     </div>
-
                                     {/* Product Details Area */}
                                     <div className="mt-5 px-2 pb-2">
                                         <div className="flex justify-between items-start mb-1">
