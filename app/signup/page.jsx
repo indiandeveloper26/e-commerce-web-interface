@@ -42,6 +42,8 @@ export default function SignupPage() {
                 headers: { "Content-Type": "application/json" },
             });
 
+            console.log('restata', res)
+
             if (res.status === 409) {
                 setMessage("Email already exists. Please login or use another email.");
                 setLoading(false);

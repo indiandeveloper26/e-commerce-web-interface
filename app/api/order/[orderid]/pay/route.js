@@ -10,7 +10,9 @@ export async function POST(req, { params }) {
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature, userid } = await req.json();
 
 
-    console.log('orderidd', orderid, 'userid', userid)
+    // console.log('orderidd', orderid, 'userid', userid)
+
+    console.log('all data', razorpay_payment_id, razorpay_order_id, razorpay_signature, userid)
 
     // verify signature
     const generated_signature = crypto

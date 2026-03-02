@@ -139,6 +139,7 @@ export async function POST(request) {
         // Create NextResponse
         const response = NextResponse.json({
             message: "User created and logged in",
+            user: user,
             userId: user._id,
         }, { status: 201 });
 
