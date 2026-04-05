@@ -64,6 +64,10 @@ export default function ProductDetailPage() {
     };
 
     const handleBuyNow = () => {
+        if (!isLoggedIn) {
+            toast.error("Please login first");
+            return;
+        }
         localStorage.setItem("buyNowProduct", JSON.stringify(product));
         router.push("/checkout");
     };

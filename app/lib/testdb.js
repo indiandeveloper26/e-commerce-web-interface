@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 
 
-console.log("hiidb"); // debug
+
 
 const MONGODB_URI = 'mongodb+srv://akgaud079:sahilmummy@cluster0.pcpf2.mongodb.net/'
 
