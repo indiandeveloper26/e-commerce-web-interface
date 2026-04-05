@@ -169,6 +169,15 @@ export default function Header() {
                                     <Link href="/login" onClick={() => setIsOpen(false)} className="py-4 bg-white text-[#F54D27] text-center rounded-2xl font-black uppercase tracking-widest">Sign In</Link>
                                 )}
                             </div>
+                            <div className="flex items-center justify-between opacity-50">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-white">System Stable</span>
+                                </div>
+                                <div className="bg-white/10 px-3 py-1 rounded-lg border border-white/10">
+                                    <span className=" text-white font-black text-xs tracking-tighter italic">v1.3</span>
+                                </div>
+                            </div>
                         </div>
                     </motion.div>
                 )}
