@@ -24,31 +24,13 @@ export default function Footer() {
                                 S
                             </div>
                             <span className="text-3xl font-black italic tracking-tighter uppercase">
-                                Soyab Akhtar<span className="text-[#F54D27]">.</span>
+                                Suraj Gaud<span className="text-[#F54D27]">.</span>
                             </span>
                         </Link>
                         <div className="text-sm font-medium opacity-60 leading-relaxed max-w-sm uppercase tracking-wider text-[11px] space-y-2">
                             <p>GSTIN: 06ESSPA3443R1Z4</p>
-                            <p>Address: Kanwarsika Bus Stop, Nuh Road, Roz Ka Meo Industrial Area, Nuh, Haryana - 122103</p>
+                            <p>Address: Khamhariya, Sujar, Haryana, Basti, Uttar Pradesh - India</p>
                         </div>
-
-                        {/* Social Cloud */}
-                        {/* <div className="flex gap-3">
-                            {[
-                                { Icon: Facebook, href: "#" },
-                                { Icon: Instagram, href: "#" },
-                                { Icon: Twitter, href: "#" },
-                                { Icon: MessageSquare, href: "#" },
-                            ].map((social, i) => (
-                                <a
-                                    key={i}
-                                    href={social.href}
-                                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:-translate-y-1 ${isDark ? "bg-gray-800 text-white hover:bg-[#F54D27]" : "bg-white shadow-sm text-gray-400 hover:bg-[#F54D27] hover:text-white"}`}
-                                >
-                                    <social.Icon size={18} />
-                                </a>
-                            ))}
-                        </div> */}
                     </div>
 
                     {/* Quick Navigation */}
@@ -68,7 +50,7 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Legal - PayU Verification Pages */}
+                    {/* Legal */}
                     <div className="lg:col-span-2">
                         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#F54D27] mb-8">Legal & Policy</h3>
                         <ul className="space-y-4">
@@ -90,33 +72,12 @@ export default function Footer() {
                             ))}
                         </ul>
                     </div>
-
-                    {/* Contact Card */}
-                    {/* <div className="lg:col-span-4">
-                        <div className={`p-8 rounded-[2.5rem] ${isDark ? "bg-gray-800/50" : "bg-white shadow-xl border border-gray-100"}`}>
-                            <h3 className="text-sm font-black italic uppercase tracking-tighter mb-6">Official Support</h3>
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
-                                    <Phone size={14} className="text-[#F54D27]" />
-                                    <span className="text-[10px] font-black tracking-widest uppercase">+91 [Your Number]</span>
-                                </div>
-                                <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
-                                    <Mail size={14} className="text-[#F54D27]" />
-                                    <span className="text-[10px] font-black tracking-widest uppercase">[Your Email]</span>
-                                </div>
-                                <div className="flex items-start gap-3 opacity-60 hover:opacity-100 transition-opacity">
-                                    <MapPin size={14} className="text-[#F54D27] shrink-0" />
-                                    <span className="text-[10px] font-black tracking-widest uppercase">Nuh, Haryana, 122103</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div> */}
                 </div>
 
                 {/* Bottom Bar */}
                 <div className={`mt-20 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 ${isDark ? "border-gray-800" : "border-gray-100"}`}>
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 text-center md:text-left">
-                        © {new Date().getFullYear()} Soyab Akhtar. All Rights Reserved.
+                        © {new Date().getFullYear()} Suraj Gaud. All Rights Reserved.
                     </p>
                     <div className="flex gap-6">
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-20 hover:opacity-100 cursor-pointer transition-opacity">Visa</span>
@@ -125,6 +86,6 @@ export default function Footer() {
                     </div>
                 </div>
             </div>
-        </footer >
+        </footer>
     );
 }

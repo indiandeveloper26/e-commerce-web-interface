@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../Redux/contextapi";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 
 export default function ProductSlider({ products = [] }) {
     const router = useRouter();
@@ -13,6 +13,7 @@ export default function ProductSlider({ products = [] }) {
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const [itemsPerView, setItemsPerView] = useState(4);
+    const [isPaused, setIsPaused] = useState(false);
 
     // Responsive Logic
     useEffect(() => {
@@ -26,109 +27,122 @@ export default function ProductSlider({ products = [] }) {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    // --- AUTO SLIDE LOGIC ---
-    useEffect(() => {
-        if (!products.length) return;
-
-        const interval = setInterval(() => {
-            nextSlide();
-        }, 2000); // Har 4 second mein slide hoga
-
-        return () => clearInterval(interval);
-    }, [currentIndex, itemsPerView, products.length]);
-
-    const nextSlide = () => {
-        if (currentIndex >= products.length - Math.floor(itemsPerView)) {
-            setCurrentIndex(0); // Khatam hone par wapas shuru se
-        } else {
-            setCurrentIndex(prev => prev + 1);
-        }
-    };
+    const nextSlide = useCallback(() => {
+        const maxIndex = products.length - Math.floor(itemsPerView);
+        setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
+    }, [products.length, itemsPerView]);
 
     const prevSlide = () => {
-        if (currentIndex <= 0) {
-            setCurrentIndex(products.length - Math.floor(itemsPerView));
-        } else {
-            setCurrentIndex(prev => prev - 1);
-        }
+        const maxIndex = products.length - Math.floor(itemsPerView);
+        setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
     };
+
+    // Auto Slide with Pause on Hover
+    useEffect(() => {
+        if (!products.length || isPaused) return;
+        const interval = setInterval(nextSlide, 3000);
+        return () => clearInterval(interval);
+    }, [nextSlide, products.length, isPaused]);
 
     if (!products.length) return null;
 
     return (
-        /* PC par 55% aur Mobile par 100% */
-        <div className="w-full lg:w-[55%] mx-auto relative group py-4 transition-all duration-500">
-
+        <div
+            className="w-full lg:w-[60%] mx-auto relative group py-8 px-2"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+        >
             {/* Viewport Container */}
-            <div className="overflow-hidden rounded-[2.5rem] relative">
+            <div className="overflow-hidden rounded-[2rem] lg:rounded-[3rem] relative p-1">
 
-                {/* Navigation Buttons */}
-                <button
-                    onClick={prevSlide}
-                    className={`absolute left-3 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all shadow-lg
-                    ${isDark ? "bg-white/10 text-white border-white/10" : "bg-white/80 text-black border-gray-100"}`}
-                >
-                    <ChevronLeft size={18} />
-                </button>
+                {/* Custom Glass Navigation Buttons */}
+                <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 z-30 pointer-events-none">
+                    <button
+                        onClick={prevSlide}
+                        className={`pointer-events-auto p-3 rounded-full backdrop-blur-xl border transition-all duration-300 transform -translate-x-10 group-hover:translate-x-0 opacity-0 group-hover:opacity-100 shadow-2xl
+                        ${isDark ? "bg-black/20 border-white/10 text-white hover:bg-white/20" : "bg-white/40 border-gray-200 text-black hover:bg-white/80"}`}
+                    >
+                        <ChevronLeft size={22} strokeWidth={2.5} />
+                    </button>
 
-                <button
-                    onClick={nextSlide}
-                    className={`absolute right-3 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all shadow-lg
-                    ${isDark ? "bg-white/10 text-white border-white/10" : "bg-white/80 text-black border-gray-100"}`}
-                >
-                    <ChevronRight size={18} />
-                </button>
+                    <button
+                        onClick={nextSlide}
+                        className={`pointer-events-auto p-3 rounded-full backdrop-blur-xl border transition-all duration-300 transform translate-x-10 group-hover:translate-x-0 opacity-0 group-hover:opacity-100 shadow-2xl
+                        ${isDark ? "bg-black/20 border-white/10 text-white hover:bg-white/20" : "bg-white/40 border-gray-200 text-black hover:bg-white/80"}`}
+                    >
+                        <ChevronRight size={22} strokeWidth={2.5} />
+                    </button>
+                </div>
 
                 {/* Slider Track */}
                 <motion.div
                     className="flex"
                     animate={{ x: `-${currentIndex * (100 / itemsPerView)}%` }}
                     transition={{
-                        type: "tween",
-                        ease: "easeInOut",
-                        duration: 1 // --- 1 SECOND SMOOTH TRANSITION ---
+                        type: "spring",
+                        stiffness: 260,
+                        damping: 20,
+                        mass: 0.5
                     }}
                 >
                     {products.map((product) => (
                         <div
                             key={product._id}
-                            className="flex-none px-2"
+                            className="flex-none px-2 mb-2"
                             style={{ width: `${100 / itemsPerView}%` }}
                         >
-                            <div
+                            <motion.div
+                                whileHover={{ y: -5 }}
                                 onClick={() => router.push(`/products/${product.slug}`)}
-                                className={`group/card relative aspect-[4/5] rounded-[2rem] overflow-hidden cursor-pointer shadow-sm
-                                ${isDark ? "bg-[#111] border border-white/5" : "bg-gray-50 border border-gray-100"}`}
+                                className={`group/card relative aspect-[4/5.5] rounded-[1.8rem] overflow-hidden cursor-pointer transition-all duration-500
+                                ${isDark ? "bg-[#0f0f0f] border border-white/5 ring-1 ring-white/5" : "bg-white border border-gray-100 shadow-sm"}`}
                             >
                                 <img
                                     src={product.images?.[0] || "/placeholder.png"}
                                     alt={product.name}
-                                    className="w-full h-full object-cover transition-transform duration-1000 group-hover/card:scale-110"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
                                 />
 
-                                {/* Info Overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-all duration-500 flex flex-col justify-end p-5">
-                                    <h3 className="text-white text-xs font-bold truncate">{product.name}</h3>
-                                    <p className="text-[#F54D27] text-[10px] font-black italic mt-1">₹{product.price}</p>
+                                {/* Modern Gradient Overlay */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60 group-hover/card:opacity-90 transition-opacity duration-500" />
+
+                                {/* Product Info */}
+                                <div className="absolute inset-0 flex flex-col justify-end p-4 lg:p-6 translate-y-4 group-hover/card:translate-y-0 transition-transform duration-500">
+                                    <div className="flex justify-between items-end gap-2">
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="text-white text-xs lg:text-sm font-semibold truncate tracking-wide">
+                                                {product.name}
+                                            </h3>
+                                            <p className="text-[#F54D27] text-sm lg:text-base font-bold mt-1 tracking-tighter">
+                                                ₹{product.price.toLocaleString()}
+                                            </p>
+                                        </div>
+                                        <div className="bg-[#F54D27] p-2 rounded-xl text-white opacity-0 group-hover/card:opacity-100 transition-all duration-500 scale-50 group-hover/card:scale-100 shadow-lg shadow-[#F54D27]/30">
+                                            <ArrowUpRight size={16} />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         </div>
                     ))}
                 </motion.div>
             </div>
 
-            {/* Smooth Progress Indicator */}
-            <div className="flex justify-center mt-6">
-                <div className={`h-[2px] w-24 relative overflow-hidden rounded-full ${isDark ? "bg-white/10" : "bg-gray-100"}`}>
+            {/* Premium Minimal Progress Bar */}
+            <div className="flex flex-col items-center mt-8 gap-3">
+                <div className={`h-[3px] w-32 relative overflow-hidden rounded-full ${isDark ? "bg-white/10" : "bg-gray-200"}`}>
                     <motion.div
-                        className="absolute h-full bg-[#F54D27]"
+                        className="absolute h-full bg-gradient-to-r from-[#F54D27] to-[#ff7a5c]"
                         animate={{
                             width: `${(itemsPerView / products.length) * 100}%`,
                             left: `${(currentIndex / products.length) * 100}%`
                         }}
-                        transition={{ duration: 1 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                 </div>
+                <span className={`text-[10px] font-medium tracking-[0.2em] uppercase ${isDark ? "text-white/40" : "text-gray-400"}`}>
+                    {Math.min(currentIndex + itemsPerView, products.length)} / {products.length}
+                </span>
             </div>
         </div>
     );
