@@ -49,7 +49,7 @@ export default function PaymentPage() {
             const paymentData = paymentRes.data;
 
             const options = {
-                key: "rzp_test_RqlfH5s7HXQ2nY",
+                key: 'rzp_test_T6acFMA7nhT3y9',
                 amount: paymentData.amount,
                 currency: "INR",
                 name: "My Shop",

@@ -2,11 +2,20 @@ import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
 
 const razorpay = new Razorpay({
-    key_id: "rzp_test_RqlfH5s7HXQ2nY",
-    key_secret: "UfpXFSrIeX0cmHGXJoDHurhI",
+    key_id: 'rzp_test_T6acFMA7nhT3y9',
+    key_secret: '9My5zZsINeJnu3gBn5QrYSCd'
+
 });
 
 export async function POST(req) {
+
+
+    console.log('pyametn catingggg.....',
+
+
+        process.env.RAZORPAY_KEY_ID,
+        process.env.RAZORPAY_KEY_SECRE
+    )
 
     // return NextResponse.json({ 'dafdsaf': "dataayayaya" })
     try {

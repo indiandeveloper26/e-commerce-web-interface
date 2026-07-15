@@ -6,8 +6,10 @@ import Link from "next/link";
 import { ShoppingBag, Box, Sun, Moon, LogOut, Menu, X, User, ChevronDown, Settings } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "../Redux/contextapi";
+
 import { logout } from "../Redux/authslice";
 import { motion, AnimatePresence } from "framer-motion";
+import { VERSION } from "../../lib/ver";
 
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
@@ -114,9 +116,56 @@ export default function Header() {
                                         <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                             className="absolute right-0 mt-3 w-56 rounded-[2rem] bg-white shadow-2xl p-2 z-[60] overflow-hidden border border-gray-100"
                                         >
-                                            <div className="px-4 py-3 border-b border-gray-50 mb-1 text-gray-900">
-                                                <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Signed in as</p>
-                                                <p className="text-sm font-bold truncate">{userData?.name}</p>
+                                            {/* ============================================
+    USER INFO WITH VERSION - PREMIUM VERSION
+============================================ */}
+                                            <div className="px-3 sm:px-4 py-3 sm:py-4 border-b border-gray-50/10">
+
+                                                <div className="flex items-start sm:items-center gap-2 sm:gap-3">
+
+                                                    {/* User Avatar */}
+                                                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#F54D27] to-orange-500 flex items-center justify-center flex-shrink-0">
+                                                        <span className="text-xs sm:text-sm font-black text-white">
+                                                            {userData?.name?.charAt(0)?.toUpperCase() || "U"}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* User Info */}
+                                                    <div className="flex-1 min-w-0">
+                                                        {/* Signed in as */}
+                                                        <p className="text-[8px] sm:text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                                                            Signed in as
+                                                        </p>
+
+                                                        {/* Name */}
+                                                        <p className="text-xs sm:text-sm font-bold truncate text-white/90">
+                                                            {userData?.name || "Guest User"}
+                                                        </p>
+
+                                                        {/* Email (optional) */}
+                                                        {userData?.email && (
+                                                            <p className="text-[8px] sm:text-[10px] text-gray-400 truncate">
+                                                                {userData.email}
+                                                            </p>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Version Badge */}
+                                                    <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+                                                        <span className="text-[6px] sm:text-[8px] font-black uppercase text-gray-400 tracking-widest">
+                                                            Version
+                                                        </span>
+                                                        <div className="flex items-center gap-1 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-[#F54D27]/10 border border-[#F54D27]/20">
+                                                            <span className="w-1 h-1 rounded-full bg-[#F54D27] animate-pulse"></span>
+                                                            <span className="text-[7px] sm:text-[10px] font-black text-[#F54D27] tracking-wider">
+                                                                {VERSION || 'v1.0.0'}
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-[6px] sm:text-[8px] text-gray-500">
+                                                            {process.env.NODE_ENV === 'production' ? '🚀 Live' : '🧪 Dev'}
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <DropdownItem icon={<User size={16} />} label="My Profile" onClick={() => { router.push('/profile'); setProfileOpen(false); }} />
                                             <DropdownItem icon={<Box size={16} />} label="Orders" onClick={() => { router.push('/orders'); setProfileOpen(false); }} />
