@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
 
 const razorpay = new Razorpay({
-    key_id: 'rzp_test_T6acFMA7nhT3y9',
-    key_secret: '9My5zZsINeJnu3gBn5QrYSCd'
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
 
 });
 
@@ -14,7 +14,7 @@ export async function POST(req) {
 
 
         process.env.RAZORPAY_KEY_ID,
-        process.env.RAZORPAY_KEY_SECRE
+        process.env.RAZORPAY_KEY_SECRET
     )
 
     // return NextResponse.json({ 'dafdsaf': "dataayayaya" })
@@ -34,6 +34,9 @@ export async function POST(req) {
 
         return new Response(JSON.stringify(paymentOrder), { status: 200 });
     } catch (err) {
+
+        console.log('error ', err)
+
         return new Response(JSON.stringify({ message: err.message }), { status: 500 });
     }
 }
