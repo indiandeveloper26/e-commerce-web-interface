@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ShoppingBag, Box, Sun, Moon, LogOut, Menu, X, User, ChevronDown, Settings } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "../Redux/contextapi";
-
+import Swal from "sweetalert2";
 import { logout } from "../Redux/authslice";
 import { motion, AnimatePresence } from "framer-motion";
 import { VERSION } from "../../lib/ver";
@@ -47,13 +47,35 @@ export default function Header() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    const handleLogout = async () => {
-        await fetch("/api/auth/logout");
-        dispatch(logout());
-        setProfileOpen(false);
-        setIsOpen(false);
-        router.push("/login");
-    };
+
+
+
+const handleLogout = async () => {
+
+  const result = await Swal.fire({
+title: "Confirm Logout",
+text: "Are you sure you want to log out of your account?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, Logout",
+    cancelButtonText: "Cancel",
+  });
+
+
+  if (result.isConfirmed) {
+
+    await fetch("/api/auth/logout");
+
+    dispatch(logout());
+
+    setProfileOpen(false);
+    setIsOpen(false);
+
+    router.push("/login");
+
+  }
+
+};
 
     return (
         <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? "py-3 bg-[#F54D27] shadow-xl" : "py-5 bg-[#F54D27]"}`}>

@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { useTheme } from "../Redux/contextapi";
 import { motion } from "framer-motion";
 import { MapPin, CreditCard, ShieldCheck, Truck, ShoppingBag, ArrowLeft } from "lucide-react";
+import useLoadingStore from "../Redux/useLoadingStore";
 
 export default function CheckoutPage() {
     const router = useRouter();
@@ -18,6 +19,8 @@ export default function CheckoutPage() {
     const [paymentMethod, setPaymentMethod] = useState("Online");
     const [loading, setLoading] = useState(true);
     const [id, setsetid] = useState("");
+
+    const { loadingg, startLoading, stopLoading } = useLoadingStore()
 
     useEffect(() => {
         const storedId = localStorage.getItem("id");
@@ -39,8 +42,12 @@ export default function CheckoutPage() {
     const handlePlaceOrder = async () => {
         if (!id) return toast.error("Please login first to continue.");
         if (!address) return toast.error("Shipping address is required!");
-
+      
         try {
+
+             startLoading(true)
+
+
             const res = await fetch("/api/order", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -66,6 +73,9 @@ export default function CheckoutPage() {
             }
         } catch (err) {
             toast.error("Network error. Please try again.");
+        }
+        finally {
+            stopLoading(false)
         }
     };
 
@@ -204,7 +214,9 @@ export default function CheckoutPage() {
                                 className="w-full py-6 rounded-3xl bg-[#F54D27] hover:bg-[#e04322] text-white font-black text-lg uppercase tracking-[0.1em] shadow-2xl shadow-[#F54D27]/40 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
                             >
                                 <ShoppingBag size={20} />
-                                CONFIRM ORDER & PAY
+
+
+                                <ShoppingBag size={18} /> {loadingg ? "WAITING..." : "CONFIRM ORDER & PAY"}
                             </button>
                             <p className="text-center mt-6 text-[10px] font-bold opacity-40 uppercase tracking-widest">
                                 By clicking, you agree to our Terms of Service

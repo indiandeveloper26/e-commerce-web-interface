@@ -7,8 +7,9 @@ import { useTheme } from "../../Redux/contextapi";
 import axios from "axios";
 import { useRazorpay } from "react-razorpay";
 import { motion } from "framer-motion";
-import { ShieldCheck, CreditCard, Package, ChevronRight, Lock } from "lucide-react";
+import { ShieldCheck, CreditCard, Package, ChevronRight, Lock, ShoppingBag } from "lucide-react";
 import ProductSkeletonCard from "../../componet/skeliton";
+import useLoadingStore from "../../Redux/useLoadingStore";
 
 export default function PaymentPage() {
     const router = useRouter();
@@ -19,6 +20,8 @@ export default function PaymentPage() {
 
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    const { loadingg, startLoading, stopLoading } = useLoadingStore()
 
     useEffect(() => {
         const fetchOrder = async () => {
@@ -35,12 +38,17 @@ export default function PaymentPage() {
     }, [orderid]);
 
     const handlePayment = async () => {
+
+console.log('process.env.RAZORPAY_KEY_ID',process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID)
+
         if (!order || !userid) {
             toast.error("Session expired. Please log in again.");
             return;
         }
 
         try {
+
+            startLoading(true)
             const paymentRes = await axios.post("/api/pymnet/crate", {
                 orderId: order._id,
                 amount: order.totalPrice * 100,
@@ -49,7 +57,7 @@ export default function PaymentPage() {
             const paymentData = paymentRes.data;
 
             const options = {
-                key: 'rzp_test_T6acFMA7nhT3y9',
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
                 amount: paymentData.amount,
                 currency: "INR",
                 name: "My Shop",
@@ -80,6 +88,9 @@ export default function PaymentPage() {
             razorpayInstance.open();
         } catch (err) {
             toast.error("Could not initiate payment");
+        }
+        finally {
+            stopLoading(false)
         }
     };
 
@@ -151,7 +162,8 @@ export default function PaymentPage() {
                                 className="w-full py-6 rounded-3xl bg-gray-900 text-white hover:bg-black font-black text-lg uppercase tracking-widest shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 group"
                             >
                                 <CreditCard size={20} className="group-hover:animate-pulse" />
-                                PAY WITH RAZORPAY
+
+                                <ShoppingBag size={18} /> {loadingg ? "WAITING..." : "   PAY WITH RAZORPAY"}
                                 <ChevronRight size={20} />
                             </button>
                         ) : (

@@ -66,6 +66,9 @@ import Order from "../../../../models/order";
 import Usercrate from "../../../../models/User";
 
 export async function POST(req, { params }) {
+
+console.log('key seracrte hai okk ',process.env.RAZORPAY_KEY_SECRET)
+
     try {
         await dbConnect();
 

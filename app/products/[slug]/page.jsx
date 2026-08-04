@@ -8,6 +8,7 @@ import { fetchProducts } from "../../Redux/productsSlice";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ShoppingBag, ArrowLeft, Zap, ShieldCheck, Truck, Star } from "lucide-react";
+import useLoadingStore from "../../Redux/useLoadingStore";
 
 export default function ProductDetailPage() {
     const params = useParams();
@@ -63,15 +64,49 @@ export default function ProductDetailPage() {
         }
     };
 
-    const handleBuyNow = () => {
+
+    const { loadingg, startLoading, stopLoading } = useLoadingStore()
+
+    useEffect(() => {
+        console.log('lodin in butotn All', adding)
+
+
+    }, [adding]);
+
+
+
+const handleBuyNow = async () => {
+
+    try {
+
         if (!isLoggedIn) {
             toast.error("Please login first");
             return;
         }
-        localStorage.setItem("buyNowProduct", JSON.stringify(product));
-        router.push("/checkout");
-    };
 
+        startLoading(true);
+
+        localStorage.setItem(
+            "buyNowProduct",
+            JSON.stringify(product)
+        );
+
+
+      
+
+        router.push("/checkout");
+
+
+    } catch (error) {
+
+        toast.error("Error");
+
+    } finally {
+
+        stopLoading(false);
+
+    }
+};
     if (loading) return (
         <div className="flex items-center justify-center min-h-[60vh]">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F54D27]"></div>
@@ -207,7 +242,7 @@ export default function ProductDetailPage() {
                                 onClick={handleBuyNow}
                                 className="w-full py-5 bg-[#F54D27] text-white rounded-[1.5rem] font-black uppercase tracking-widest text-sm shadow-xl shadow-[#F54D27]/20 hover:bg-[#e04322] transition-all active:scale-95"
                             >
-                                BUY IT NOW
+                                <ShoppingBag size={18} /> {loadingg ? "WAITING..." : "BUY IT NOW"}
                             </button>
                         </div>
                     </div>

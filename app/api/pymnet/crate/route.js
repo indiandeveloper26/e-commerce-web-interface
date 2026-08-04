@@ -13,7 +13,7 @@ export async function POST(req) {
     console.log('pyametn catingggg.....',
 
 
-        process.env.RAZORPAY_KEY_ID,
+        process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         process.env.RAZORPAY_KEY_SECRET
     )
 

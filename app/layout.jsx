@@ -5,6 +5,10 @@ import ProviderWrapper from "./Redux/provider";
 import { ThemeProvider } from "./Redux/contextapi";
 import { ToastContainer } from "react-toastify";
 import Footer from "./componet/footer";
+import GlobalClickListener from "./componet/GlobalClickListener";
+import { Toaster } from "react-hot-toast";
+import ProgressBar from "./componet/ProgressBar";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,8 +24,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ProgressBar />
         <ProviderWrapper>
           <ThemeProvider>
+
 
             <Header />
 
@@ -30,6 +36,19 @@ export default function RootLayout({ children }) {
             </main>
             <Footer />
             <ToastContainer />
+
+
+
+            <Toaster
+              position="top-center"
+              reverseOrder={false}
+              toastOptions={{
+                duration: 3000,
+              }}
+            />
+
+
+            {/* <GlobalClickListener /> */}
 
           </ThemeProvider>
         </ProviderWrapper>

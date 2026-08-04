@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout, updateUser } from "../Redux/authslice";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../Redux/contextapi";
+
 import { motion, AnimatePresence } from "framer-motion";
 import {
     User, Mail, Shield, LogOut, ShoppingCart, Package,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 export default function ProfilePage() {
     const { user, isLoggedIn } = useSelector((state) => state.auth);
@@ -22,6 +24,8 @@ export default function ProfilePage() {
     const isDark = theme === "dark";
     const dispatch = useDispatch();
     const router = useRouter();
+    const [isOpen, setIsOpen] = useState(false);
+    const [profileOpen, setProfileOpen] = useState(false);
 
     const [activeTab, setActiveTab] = useState("overview");
     const [fullUser, setFullUser] = useState(null);
@@ -57,6 +61,32 @@ export default function ProfilePage() {
         if (isLoggedIn) fetchData();
     }, [userid, dispatch, isLoggedIn]);
 
+
+    const handleLogout = async () => {
+
+        const result = await Swal.fire({
+            title: "Confirm Logout",
+            text: "Are you sure you want to log out?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Logout",
+            cancelButtonText: "Cancel",
+        });
+
+
+        if (result.isConfirmed) {
+
+            await fetch("/api/auth/logout");
+
+            dispatch(logout());
+
+            setIsOpen(false);
+
+            router.push("/login");
+
+        }
+
+    };
     // Priority: 1. Full data from API, 2. Redux userdata, 3. Redux user root
     const displayUser = fullUser || user?.userdata || user;
 
@@ -120,7 +150,7 @@ export default function ProfilePage() {
                             </div>
                         </div>
 
-                        <button onClick={() => dispatch(logout())} className="px-8 py-4 rounded-3xl bg-red-500/10 text-red-500 font-black text-xs tracking-widest hover:bg-red-500 hover:text-white transition-all active:scale-95 flex items-center gap-2">
+                        <button onClick={() => handleLogout()} className="px-8 py-4 rounded-3xl bg-red-500/10 text-red-500 font-black text-xs tracking-widest hover:bg-red-500 hover:text-white transition-all active:scale-95 flex items-center gap-2">
                             <LogOut size={18} /> SIGN OUT
                         </button>
                     </div>
